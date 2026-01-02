@@ -3,6 +3,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
+import { AuthService } from './services/auth.service';
+import { AuthDomainService } from './services/auth-domain.service';
+import { BcryptPasswordAdapter } from './adapters/bcrypt-password.adapter';
+import { UsersServiceAdapter } from './adapters/users-service.adapter';
 
 @Module({
   imports:[
@@ -20,7 +24,7 @@ import { UsersModule } from 'src/users/users.module';
      ConfigModule
   ],
   controllers: [],
-  providers: [],
+  providers: [AuthService,AuthDomainService,BcryptPasswordAdapter,UsersServiceAdapter],
   exports:[JwtModule,PassportModule],
 })
 export class AuthModule {}
