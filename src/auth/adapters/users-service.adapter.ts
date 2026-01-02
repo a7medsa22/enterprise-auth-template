@@ -10,6 +10,10 @@ export class UsersServiceAdapter implements UserRepositoryPort {
     return this.usersService.findByEmail(email);
   }
 
+  async findById(id: string) {
+    return this.usersService.findById(id);
+  }
+
   async create(data: {
     email: string;
     password: string;

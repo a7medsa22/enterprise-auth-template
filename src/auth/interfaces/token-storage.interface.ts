@@ -4,4 +4,6 @@ export interface TokenStorage {
     exists(userId:string,tokenId:string): Promise<boolean>;
 
     revoke(userId:string,tokenId:string): Promise<void>;
+
+    revokeAll(userId:string): Promise<void>;
 }

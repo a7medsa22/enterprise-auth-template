@@ -7,6 +7,13 @@ import { AuthService } from './services/auth.service';
 import { AuthDomainService } from './services/auth-domain.service';
 import { BcryptPasswordAdapter } from './adapters/bcrypt-password.adapter';
 import { UsersServiceAdapter } from './adapters/users-service.adapter';
+import { TokenService } from './services/token.service';
+import { RedisTokenStorageAdapter } from './adapters/redis-token-storage.adapter';
+import { AuthController } from './auth.controller';
+import { Redis } from 'ioredis';
+import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports:[
@@ -23,8 +30,31 @@ import { UsersServiceAdapter } from './adapters/users-service.adapter';
      JwtModule,
      ConfigModule
   ],
-  controllers: [],
-  providers: [AuthService,AuthDomainService,BcryptPasswordAdapter,UsersServiceAdapter],
-  exports:[JwtModule,PassportModule],
+  controllers: [AuthController],
+  providers: [
+    AuthService,
+    AuthDomainService,
+    TokenService,
+    BcryptPasswordAdapter,
+    UsersServiceAdapter,
+    JwtAccessStrategy,
+    JwtRefreshStrategy,
+    LocalStrategy,
+    {
+      provide: 'REDIS_CLIENT',
+      useFactory: (config: ConfigService) => {
+        return new Redis({
+          host: config.get('REDIS_HOST', 'localhost'),
+          port: config.get('REDIS_PORT', 6379),
+        });
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: 'TokenStorage',
+      useClass: RedisTokenStorageAdapter,
+    },
+  ],
+  exports:[AuthService],
 })
 export class AuthModule {}
