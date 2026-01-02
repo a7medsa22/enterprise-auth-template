@@ -5,3 +5,8 @@ export interface TokenPayload {
   iat?: number;
   exp?: number;
 }
+
+export interface RefreshTokenPayload {
+  sub: string;      
+  tokenId: string;  
+}
