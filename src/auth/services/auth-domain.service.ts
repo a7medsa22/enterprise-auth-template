@@ -1,6 +1,7 @@
 import { User } from '../interfaces/user.interface';
 import { UserRepositoryPort } from '../interfaces/user-repository.interface';
 import { PasswordServicePort } from '../interfaces/password.interface';
+import { Role } from '../enums/role.enum';
 
 export class AuthDomainService  {
   constructor(
@@ -10,12 +11,13 @@ export class AuthDomainService  {
 
 
 
-  async register(email: string, password: string): Promise<User> {
+  async registerDomain(email: string, password: string): Promise<User> {
     const hash = await this.passwordService.hash(password);
 
     return this.userRepo.create({
       email,
       password: hash,
+      
     });
 
   }

@@ -15,8 +15,11 @@ export class UserEntity {
   @Column('simple-array')
   roles: string[];
 
-  @Column({ default: true })
+  @Column({ default: false })
   isActive: boolean;
+
+  @Column({ default: false })
+  emailVerified: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
