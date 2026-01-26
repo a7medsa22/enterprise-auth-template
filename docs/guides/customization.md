@@ -121,6 +121,57 @@ providers: [
 ],
 ```
 
+## Adding a New Framework Adapter
+```text
+packages/express-adapter/
+├── src/
+│   ├── infrastructure/
+│   │   └── (same as NestJS)
+│   ├── presentation/
+│   │   ├── routes/
+│   │   │   └── auth.routes.ts
+│   │   ├── middlewares/
+│   │   │   ├── auth.middleware.ts
+│   │   │   └── roles.middleware.ts
+│   │   └── controllers/
+│   │       └── auth.controller.ts
+│   └── index.ts
+└── package.json
+```
+
+```typescript
+// packages/express-adapter/src/presentation/routes/auth.routes.ts
+
+import { Router } from 'express';
+import { RegisterUser } from '@auth-template/core';
+
+export function createAuthRouter(dependencies) {
+  const router = Router();
+  
+  router.post('/register', async (req, res) => {
+    const registerUser = new RegisterUser(
+      dependencies.userRepository,
+      dependencies.passwordHasher,
+      dependencies.tokenGenerator,
+      dependencies.emailSender,
+      dependencies.eventBus,
+      dependencies.logger,
+    );
+
+    const result = await registerUser.execute(req.body);
+
+    if (result.isFailure) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    res.status(201).json(result.getValue());
+  });
+
+  return router;
+}
+```
+
+
 ## Environment Configuration
 
 ### Development
