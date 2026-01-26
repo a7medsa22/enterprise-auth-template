@@ -95,7 +95,7 @@ export class RegisterUserUseCase {
     const tokenPayload:TokenPayload = {
         userId:user.id.getValue(),
         email:user.getEmail().getValue(),
-        role:user.getRoles(),
+        roles:user.getRoles(),
     }
 
    const accessTokenOrError = await this.tokenGenerator.generateAccessToken(user.id,tokenPayload);
@@ -114,7 +114,6 @@ export class RegisterUserUseCase {
      this.emailSender.sendVerificationEmail(email.getValue(), 'token').catch(err => {
       this.logger.error('Failed to send verification email', err);
     });
-
 
 
 

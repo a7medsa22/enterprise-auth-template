@@ -1,10 +1,9 @@
-import { Email } from "../../domain/value-objects/Email";
 import { UserId } from "../../domain/value-objects/UserId";
 import { Result } from "../../shared/utils/Result";
 export interface TokenPayload {
     userId:string;
     email:string;
-    role:string[];
+    roles:string[];
 }
 export interface ITokenGenerator{
     generateAccessToken(userId:UserId,payload:TokenPayload):Promise<Result<string>>;
