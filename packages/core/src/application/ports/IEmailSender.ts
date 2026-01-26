@@ -1,4 +1,3 @@
-import { Email } from '../../domain/value-objects/Email';
 import { Result } from '../../shared/utils/Result';
 
 export interface EmailMessage {
@@ -11,7 +10,7 @@ export interface EmailMessage {
 
 export interface IEmailSender {
   send(message: EmailMessage): Promise<Result<void>>;
-  sendVerificationEmail(email: Email, token: string): Promise<Result<void>>;
-  sendPasswordResetEmail(email: Email, token: string): Promise<Result<void>>;
-  sendWelcomeEmail(email: Email, name?: string): Promise<Result<void>>;
+  sendVerificationEmail(email: string, token: string): Promise<Result<void>>;
+  sendPasswordResetEmail(email: string, token: string): Promise<Result<void>>;
+  sendWelcomeEmail(email: string, name?: string): Promise<Result<void>>;
 }
