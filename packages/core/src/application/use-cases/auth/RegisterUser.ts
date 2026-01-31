@@ -1,4 +1,8 @@
-import { IUserRepository } from 'packages/core/src/domain/repositories/IUserRepository';
+import { Role, User } from '../../../domain/entities/User';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
+import { Email } from '../../../domain/value-objects/Email';
+import { Password } from '../../../domain/value-objects/Password';
+import { Result } from '../../../shared/utils/Result';
 import {
   IEmailSender,
   ILogger,
@@ -6,11 +10,6 @@ import {
   ITokenGenerator,
   TokenPayload,
 } from '../../ports';
-import { Result } from 'packages/core/src/shared/utils/Result';
-import { Email } from 'packages/core/src/domain/value-objects/Email';
-import { Password } from 'packages/core/src/domain/value-objects/Password';
-import { Role, User } from 'packages/core/src/domain/entities/User';
-import { throws } from 'assert';
 
 export interface RegisterUserDto {
   email: string;
@@ -114,8 +113,6 @@ export class RegisterUserUseCase {
      this.emailSender.sendVerificationEmail(email.getValue(), 'token').catch(err => {
       this.logger.error('Failed to send verification email', err);
     });
-
-
 
     return Result.ok({
       userId: user.id.getValue(),
