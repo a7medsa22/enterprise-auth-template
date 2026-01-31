@@ -2,6 +2,7 @@ import { Role, User } from '../../../domain/entities/User';
 import { IUserRepository } from '../../../domain/repositories/IUserRepository';
 import { Email } from '../../../domain/value-objects/Email';
 import { Password } from '../../../domain/value-objects/Password';
+import { IEventBus, UserRegisteredEvent } from '../../../shared/events';
 import { Result } from '../../../shared/utils/Result';
 import {
   IEmailSender,
@@ -30,6 +31,7 @@ export class RegisterUserUseCase {
     private readonly passwordHasher: IPasswordHasher,
     private readonly tokenGenerator: ITokenGenerator,
     private readonly logger: ILogger,
+    private readonly eventBus:IEventBus,
   ) {}
 
   async execute(dto: RegisterUserDto): Promise<Result<RegisterUserResult>> {
@@ -113,6 +115,12 @@ export class RegisterUserUseCase {
      this.emailSender.sendVerificationEmail(email.getValue(), 'token').catch(err => {
       this.logger.error('Failed to send verification email', err);
     });
+
+    //:> Publish event
+    await this.eventBus.publish(new UserRegisteredEvent(user.id,email));
+
+    //:>log successfully
+    this.logger.info('User registered successfully',{userId:user.id.getValue()})
 
     return Result.ok({
       userId: user.id.getValue(),
