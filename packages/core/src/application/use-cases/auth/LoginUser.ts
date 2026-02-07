@@ -1,4 +1,3 @@
-import { IUserRepository } from 'packages/core/src/domain/repositories/IUserRepository';
 import { IRateLimiter } from '../../ports/IRateLimiter';
 import {
   ILogger,
@@ -6,8 +5,11 @@ import {
   ITokenGenerator,
   TokenPayload,
 } from '../../ports';
-import { Result } from 'packages/core/src/shared/utils/Result';
-import { Email } from 'packages/core/src/domain/value-objects/Email';
+import { Email } from '../../../domain/value-objects/Email';
+import { Result } from '../../../shared/utils/Result';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
+import { IPAddress } from '../../../domain/value-objects/IpAddress';
+import { IEventBus, UserLoginEvent } from '../../../shared/events';
 
 export interface LoginUserDTO {
   email: string;
@@ -31,6 +33,7 @@ export class LoginUser {
     private readonly tokenGenerator: ITokenGenerator,
     private readonly rateLimiter: IRateLimiter,
     private readonly logger: ILogger,
+    private readonly eventBus:IEventBus,
   ) {}
   async execute(dto: LoginUserDTO): Promise<Result<LoginUserResult>> {
     // 1:> Rate limiting
@@ -124,6 +127,20 @@ export class LoginUser {
       );
       return Result.fail('Unable to complete login');
     }
+
+
+    //publish Event
+    const ipAddressOrError = IPAddress.create(dto.ipAddress);
+    if(ipAddressOrError.isSuccess){
+      await this.eventBus.publish(new UserLoginEvent(user.id,ipAddressOrError.getValue()))
+    }
+
+
+    // log succrss
+    this.logger.info('User logged in successfully',{
+      userId:user.id.getValue(),
+      ipAddress:dto.ipAddress
+    });
 
     return Result.ok({
       userId: user.id.getValue(),
