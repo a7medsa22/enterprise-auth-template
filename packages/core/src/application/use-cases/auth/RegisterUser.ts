@@ -1,4 +1,9 @@
-import { IUserRepository } from 'packages/core/src/domain/repositories/IUserRepository';
+import { Role, User } from '../../../domain/entities/User';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
+import { Email } from '../../../domain/value-objects/Email';
+import { Password } from '../../../domain/value-objects/Password';
+import { IEventBus, UserRegisteredEvent } from '../../../shared/events';
+import { Result } from '../../../shared/utils/Result';
 import {
   IEmailSender,
   ILogger,
@@ -6,11 +11,6 @@ import {
   ITokenGenerator,
   TokenPayload,
 } from '../../ports';
-import { Result } from 'packages/core/src/shared/utils/Result';
-import { Email } from 'packages/core/src/domain/value-objects/Email';
-import { Password } from 'packages/core/src/domain/value-objects/Password';
-import { Role, User } from 'packages/core/src/domain/entities/User';
-import { throws } from 'assert';
 
 export interface RegisterUserDto {
   email: string;
@@ -31,6 +31,7 @@ export class RegisterUserUseCase {
     private readonly passwordHasher: IPasswordHasher,
     private readonly tokenGenerator: ITokenGenerator,
     private readonly logger: ILogger,
+    private readonly eventBus:IEventBus,
   ) {}
 
   async execute(dto: RegisterUserDto): Promise<Result<RegisterUserResult>> {
@@ -115,7 +116,11 @@ export class RegisterUserUseCase {
       this.logger.error('Failed to send verification email', err);
     });
 
+    //:> Publish event
+    await this.eventBus.publish(new UserRegisteredEvent(user.id,email));
 
+    //:>log successfully
+    this.logger.info('User registered successfully',{userId:user.id.getValue()})
 
     return Result.ok({
       userId: user.id.getValue(),
