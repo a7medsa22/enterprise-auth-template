@@ -8,32 +8,41 @@ describe('RegisterUserUseCase', () => {
 
   let registerUser: RegisterUserUseCase;
 
-  const userRepository = {
+  const userRepository = jest.mocked({
     exists: jest.fn(),
     save: jest.fn(),
-  } as Partial<jest.Mocked<IUserRepository>> as jest.Mocked<IUserRepository>;
+    findById: jest.fn(),
+    findByEmail: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    count: jest.fn(),
+  } as unknown as IUserRepository)
 
-  const emailSender = {
+  const emailSender = jest.mocked({
     sendVerificationEmail: jest.fn(),
-  } as Partial<jest.Mocked<IEmailSender>> as jest.Mocked<IEmailSender>;
+    send: jest.fn(),
+    sendPasswordResetEmail: jest.fn(),
+    sendWelcomeEmail: jest.fn(),
+  } as unknown as IEmailSender)
 
-  const passwordHasher = {
+  const passwordHasher = jest.mocked({
     validate: jest.fn(),
     hash: jest.fn(),
-  } as Partial<jest.Mocked<IPasswordHasher>> as jest.Mocked<IPasswordHasher>;
-  const tokenGenerator = {
+  } as unknown as IPasswordHasher)
+  
+  const tokenGenerator = jest.mocked({
     generateAccessToken: jest.fn(),
     generateRefreshToken: jest.fn(),
-  } as Partial<jest.Mocked<ITokenGenerator>> as jest.Mocked<ITokenGenerator>;
-
-  const logger = {
+  } as unknown as ITokenGenerator)
+  
+  const logger = jest.mocked({
     error: jest.fn(),
     info: jest.fn(),
-  } as Partial<jest.Mocked<ILogger>> as jest.Mocked<ILogger>;
+  } as unknown as ILogger)
 
-  const eventBus = {
+  const eventBus = jest.mocked({
     publish: jest.fn(),
-  } as Partial<jest.Mocked<IEventBus>> as jest.Mocked<IEventBus>;
+  } as unknown as IEventBus)
 
   beforeEach(() => {
     jest.clearAllMocks();
