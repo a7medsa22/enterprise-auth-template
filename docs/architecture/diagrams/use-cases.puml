@@ -1,0 +1,81 @@
+
+@startuml use-cases
+
+title Use Cases Flow - Authentication
+
+actor User
+actor System
+
+rectangle "Authentication Use Cases" {
+  usecase (Register User) as UC1
+  usecase (Login User) as UC2
+  usecase (Refresh Token) as UC3
+  usecase (Logout User) as UC4
+  usecase (Verify Email) as UC5
+  usecase (Change Password) as UC6
+}
+
+rectangle "Infrastructure Services" {
+  usecase (Hash Password) as S1
+  usecase (Generate Token) as S2
+  usecase (Send Email) as S3
+  usecase (Check Rate Limit) as S4
+  usecase (Save to DB) as S5
+  usecase (Publish Event) as S6
+}
+
+User --> UC1 : Provides email & password
+User --> UC2 : Provides credentials
+User --> UC3 : Provides refresh token
+User --> UC4 : Requests logout
+User --> UC5 : Clicks verification link
+User --> UC6 : Provides old & new password
+
+UC1 ..> S1 : uses
+UC1 ..> S2 : uses
+UC1 ..> S3 : uses
+UC1 ..> S5 : uses
+UC1 ..> S6 : uses
+
+UC2 ..> S4 : uses
+UC2 ..> S1 : uses
+UC2 ..> S2 : uses
+UC2 ..> S5 : uses
+UC2 ..> S6 : uses
+
+UC3 ..> S2 : uses
+UC3 ..> S5 : uses
+
+UC4 ..> S5 : uses
+
+UC5 ..> S5 : uses
+UC5 ..> S6 : uses
+
+UC6 ..> S1 : uses
+UC6 ..> S5 : uses
+UC6 ..> S6 : uses
+
+note right of UC1
+  RegisterUser Use Case:
+  1. Validate email & password
+  2. Check if user exists
+  3. Hash password
+  4. Create user entity
+  5. Save to database
+  6. Generate tokens
+  7. Send verification email
+  8. Publish UserRegistered event
+end note
+
+note right of UC2
+  LoginUser Use Case:
+  1. Check rate limit
+  2. Validate credentials
+  3. Verify password
+  4. Check account status
+  5. Check email verified
+  6. Generate tokens
+  7. Publish UserLoggedIn event
+end note
+
+@enduml

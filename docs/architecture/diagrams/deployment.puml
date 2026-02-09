@@ -1,0 +1,99 @@
+
+@startuml deployment
+
+title Deployment Architecture - Production
+
+node "Load Balancer" as LB {
+  [Nginx]
+}
+
+node "API Server 1" as API1 {
+  [NestJS App 1]
+}
+
+node "API Server 2" as API2 {
+  [NestJS App 2]
+}
+
+node "API Server 3" as API3 {
+  [NestJS App 3]
+}
+
+database "PostgreSQL Primary" as DB1 {
+  [Users Table]
+  [Sessions Table]
+  [Tokens Table]
+  [Audit Logs]
+}
+
+database "PostgreSQL Replica 1" as DB2 {
+  [Read Replica]
+}
+
+database "PostgreSQL Replica 2" as DB3 {
+  [Read Replica]
+}
+
+database "Redis Cluster" as Redis {
+  [Cache]
+  [Session Store]
+  [Rate Limiter]
+}
+
+cloud "External Services" as External {
+  [SendGrid]
+  [Monitoring]
+  [Logging]
+}
+
+[Nginx] --> [NestJS App 1] : HTTPS
+[Nginx] --> [NestJS App 2] : HTTPS
+[Nginx] --> [NestJS App 3] : HTTPS
+
+[NestJS App 1] --> [Users Table] : Write
+[NestJS App 1] --> [Read Replica] : Read
+[NestJS App 1] --> [Cache] : R/W
+
+[NestJS App 2] --> [Users Table] : Write
+[NestJS App 2] --> [Read Replica] : Read
+[NestJS App 2] --> [Cache] : R/W
+
+[NestJS App 3] --> [Users Table] : Write
+[NestJS App 3] --> [Read Replica] : Read
+[NestJS App 3] --> [Cache] : R/W
+
+[Users Table] --> [Read Replica] : Replication
+
+[NestJS App 1] --> [SendGrid] : Email
+[NestJS App 1] --> [Monitoring] : Metrics
+[NestJS App 1] --> [Logging] : Logs
+
+note right of [Nginx]
+  - SSL Termination
+  - Rate Limiting
+  - Load Balancing
+  - Health Checks
+end note
+
+note right of [NestJS App 1]
+  - Stateless design
+  - Horizontal scaling
+  - Auto-scaling ready
+  - Health endpoint
+end note
+
+note right of [Users Table]
+  - Primary database
+  - All write operations
+  - Backup every 6 hours
+  - Point-in-time recovery
+end note
+
+note right of [Cache]
+  - Session caching
+  - Token validation cache
+  - Rate limit counters
+  - User data cache
+end note
+
+@enduml

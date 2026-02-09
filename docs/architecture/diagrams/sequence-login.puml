@@ -1,0 +1,85 @@
+
+@startuml sequence-login
+
+title Login Sequence - Detailed Flow
+
+actor User
+participant "AuthController" as Controller
+participant "LoginUser UC" as UseCase
+participant "RateLimiter" as Limiter
+participant "UserRepository" as Repo
+participant "PasswordHasher" as Hasher
+participant "TokenGenerator" as Token
+participant "EventBus" as Events
+participant "Database" as DB
+
+User -> Controller: POST /auth/login\n{email, password}
+activate Controller
+
+Controller -> UseCase: execute(loginDto)
+activate UseCase
+
+UseCase -> Limiter: check(email)
+activate Limiter
+Limiter -> Limiter: Count attempts
+alt Rate limit exceeded
+  Limiter --> UseCase: Failure(Too many attempts)
+  UseCase --> Controller: Failure
+  Controller --> User: 429 Too Many Requests
+else Rate limit OK
+  Limiter --> UseCase: Success
+  deactivate Limiter
+
+  UseCase -> Repo: findByEmail(email)
+  activate Repo
+  Repo -> DB: SELECT * FROM users WHERE email = ?
+  activate DB
+  DB --> Repo: User data
+  deactivate DB
+  Repo --> UseCase: User entity
+  deactivate Repo
+
+  UseCase -> Hasher: compare(password, user.password)
+  activate Hasher
+  Hasher --> UseCase: isValid = true
+  deactivate Hasher
+
+  alt Password invalid
+    UseCase -> Limiter: recordFailedAttempt
+    UseCase --> Controller: Failure(Invalid credentials)
+    Controller --> User: 401 Unauthorized
+  else Password valid
+    
+    UseCase -> UseCase: Check account status
+    UseCase -> UseCase: Check email verified
+    
+    UseCase -> Token: generateAccessToken(user)
+    activate Token
+    Token --> UseCase: accessToken
+    deactivate Token
+    
+    UseCase -> Token: generateRefreshToken(user)
+    activate Token
+    Token --> UseCase: refreshToken
+    deactivate Token
+    
+    UseCase -> DB: Save refresh token
+    activate DB
+    DB --> UseCase: OK
+    deactivate DB
+    
+    UseCase -> Events: publish(UserLoggedInEvent)
+    activate Events
+    Events --> UseCase: OK
+    deactivate Events
+    
+    UseCase -> Limiter: resetAttempts(email)
+    
+    UseCase --> Controller: Success(user, tokens)
+    deactivate UseCase
+    Controller --> User: 200 OK\n{user, accessToken, refreshToken}
+    deactivate Controller
+  end
+end
+
+@enduml

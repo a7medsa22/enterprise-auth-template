@@ -1,0 +1,79 @@
+@startuml architecture
+!define RECTANGLE class
+
+
+title Clean Architecture - Auth Template
+
+package "Domain Layer" <<Rectangle>> #LightGreen {
+  [User Entity]
+  [Session Entity]
+  [RefreshToken Entity]
+  [Email VO]
+  [Password VO]
+  [IUserRepository]
+  [ISessionRepository]
+}
+
+package "Application Layer" <<Rectangle>> #LightBlue {
+  [RegisterUser UC]
+  [LoginUser UC]
+  [RefreshToken UC]
+  [IPasswordHasher]
+  [ITokenGenerator]
+  [IEmailSender]
+}
+
+package "Infrastructure Layer" <<Rectangle>> #LightYellow {
+  [TypeOrmUserRepo]
+  [BcryptHasher]
+  [JwtTokenGenerator]
+  [SendGridEmail]
+  [RedisCache]
+}
+
+package "Presentation Layer" <<Rectangle>> #LightPink {
+  [AuthController]
+  [JwtStrategy]
+  [Guards]
+  [Decorators]
+}
+
+[RegisterUser UC] --> [IUserRepository] : uses
+[RegisterUser UC] --> [IPasswordHasher] : uses
+[RegisterUser UC] --> [ITokenGenerator] : uses
+[RegisterUser UC] --> [IEmailSender] : uses
+
+[TypeOrmUserRepo] ..|> [IUserRepository] : implements
+[BcryptHasher] ..|> [IPasswordHasher] : implements
+[JwtTokenGenerator] ..|> [ITokenGenerator] : implements
+[SendGridEmail] ..|> [IEmailSender] : implements
+
+[AuthController] --> [RegisterUser UC] : calls
+[AuthController] --> [LoginUser UC] : calls
+
+note right of [Domain Layer]
+  Pure business logic
+  Zero dependencies
+  Framework agnostic
+end note
+
+note right of [Application Layer]
+  Business workflows
+  Depends on Domain only
+  Defines interfaces for infra
+end note
+
+note right of [Infrastructure Layer]
+  External dependencies
+  Implements interfaces
+  Database, Cache, Email
+end note
+
+note right of [Presentation Layer]
+  HTTP layer
+  Framework specific
+  Controllers & DTOs
+end note
+
+@enduml
+
