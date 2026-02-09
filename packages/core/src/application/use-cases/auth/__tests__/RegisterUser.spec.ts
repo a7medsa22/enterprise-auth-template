@@ -1,4 +1,5 @@
 import { IUserRepository } from '../../../../domain/repositories/IUserRepository';
+import { IEventBus } from '../../../../shared/events';
 import { Result } from '../../../../shared/utils/Result';
 import { IEmailSender, ILogger, IPasswordHasher, ITokenGenerator } from '../../../ports';
 import { RegisterUserUseCase } from '../RegisterUser';
@@ -27,7 +28,12 @@ describe('RegisterUserUseCase', () => {
 
   const logger = {
     error: jest.fn(),
+    info: jest.fn(),
   } as Partial<jest.Mocked<ILogger>> as jest.Mocked<ILogger>;
+
+  const eventBus = {
+    publish: jest.fn(),
+  } as Partial<jest.Mocked<IEventBus>> as jest.Mocked<IEventBus>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -38,6 +44,7 @@ describe('RegisterUserUseCase', () => {
       passwordHasher,
       tokenGenerator,
       logger,
+      eventBus,
     );
   });
 

@@ -1,4 +1,3 @@
-import { Email } from "../../domain/value-objects/Email";
 import { IPAddress } from "../../domain/value-objects/IpAddress";
 import { UserId } from "../../domain/value-objects/UserId";
 import { DomainEvent } from "./DomainEvent";
