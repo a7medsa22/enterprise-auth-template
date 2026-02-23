@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "../../dist/apps/demo",
+    "composite": true
+  },
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/nestjs-adapter" }
+  ],
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

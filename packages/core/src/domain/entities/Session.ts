@@ -5,7 +5,6 @@ import { Entity } from "./base/Entity";
 import { Result } from "../../shared/utils/Result";
 
 
-
 interface SessionProps {
     id: SessionId;
     userId: UserId;
@@ -53,7 +52,7 @@ export class Session extends Entity<SessionId> {
             id: SessionId.create(),
             userId: props.userId,
             ipAddress: props.ipAddress,
-            userAgent: props.userAgent, 
+            userAgent: props.userAgent,
             isActive: true,
             expiresAt: props.expiresAt,
             lastActivityAt: new Date(),

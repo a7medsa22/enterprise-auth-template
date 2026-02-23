@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "declaration": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@auth-template/core": ["./dist/core"],
+      "@auth-template/core/*": ["./dist/core/*"],
+      "@auth-template/nestjs-adapter": ["./dist/nestjs-adapter"],
+      "@auth-template/nestjs-adapter/*": ["./dist/nestjs-adapter/*"]
+    }
+  },
+
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/nestjs-adapter" },
+    { "path": "apps/demo" }
+  ],
+    "exclude": ["node_modules", "dist"]
+}

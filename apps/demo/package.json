@@ -1,0 +1,15 @@
+{
+  "name": "demo-api",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@auth-template/core": "workspace:*",
+    "@auth-template/nestjs-adapter": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node ../../dist/apps/demo/main.js",
+    "start:dev": "ts-node-dev src/main.ts",
+    "clean": "rimraf dist"
+  }
+}

@@ -1,4 +1,4 @@
-import { IUserRepository } from 'packages/core/src/domain/repositories/IUserRepository';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
 import {
   IEmailSender,
   ILogger,
@@ -6,11 +6,10 @@ import {
   ITokenGenerator,
   TokenPayload,
 } from '../../ports';
-import { Result } from 'packages/core/src/shared/utils/Result';
-import { Email } from 'packages/core/src/domain/value-objects/Email';
-import { Password } from 'packages/core/src/domain/value-objects/Password';
-import { Role, User } from 'packages/core/src/domain/entities/User';
-import { throws } from 'assert';
+import { Result } from '../../../shared/utils/Result';
+import { Email } from '../../../domain/value-objects/Email';
+import { Password } from '../../../domain/value-objects/Password';
+import { Role, User } from '../../../domain/entities/User';
 
 export interface RegisterUserDto {
   email: string;

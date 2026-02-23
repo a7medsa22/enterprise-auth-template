@@ -1,4 +1,4 @@
-import { IUserRepository } from 'packages/core/src/domain/repositories/IUserRepository';
+import { IUserRepository } from '../../../domain/repositories/IUserRepository';
 import { IRateLimiter } from '../../ports/IRateLimiter';
 import {
   ILogger,
@@ -6,8 +6,8 @@ import {
   ITokenGenerator,
   TokenPayload,
 } from '../../ports';
-import { Result } from 'packages/core/src/shared/utils/Result';
-import { Email } from 'packages/core/src/domain/value-objects/Email';
+import { Result } from '../../../shared/utils/Result';
+import { Email } from '../../../domain/value-objects/Email';
 
 export interface LoginUserDTO {
   email: string;

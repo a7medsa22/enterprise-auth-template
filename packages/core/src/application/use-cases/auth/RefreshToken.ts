@@ -1,6 +1,5 @@
 import { Result } from '../../../shared/utils/Result';
 import { Token } from '../../../domain/value-objects/Token';
-import { RefreshToken } from '../../../domain/entities/RefreshToken';
 import { IUserRepository } from '../../../domain/repositories/IUserRepository';
 import { ITokenRepository } from '../../../domain/repositories/ITokenRepository';
 import { ITokenGenerator, TokenPayload } from '../../ports/ITokenGenerator';
