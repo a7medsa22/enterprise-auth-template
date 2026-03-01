@@ -10,6 +10,6 @@ export interface ITokenGenerator{
     generateRefreshToken(userId:UserId):Promise<Result<string>>;
     verifyAccessToken(token:string):Promise<Result<TokenPayload>>;
     verifyRefreshToken(token:string):Promise<Result<UserId>>;
-    getAccessTokenExpiration(token:string):Promise<Result<Date>>;
-    getRefreshTokenExpiration(token:string):Promise<Result<Date>>;
-}
+    getAccessTokenExpiration():number;
+    getRefreshTokenExpiration():number;
+} 
