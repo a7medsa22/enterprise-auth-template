@@ -29,7 +29,7 @@ export interface CreateUserProps {
 }
 
 export class User extends Entity<UserId> {
-  private email: Email;
+  private readonly email: Email;
   private password: Password;
   private roles: Role[];
   private _isActive: boolean;

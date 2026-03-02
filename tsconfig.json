@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "commonjs",
+    "lib": ["ES2021"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "incremental": true,
+    "composite": true,
+    "paths": {
+      "@auth-template/core": ["./packages/core/src"],
+      "@auth-template/core/*": ["./packages/core/src/*"],
+      "@auth-template/nestjs-adapter": ["./packages/nestjs-adapter/src"],
+      "@auth-template/nestjs-adapter/*": ["./packages/nestjs-adapter/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

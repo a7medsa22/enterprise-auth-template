@@ -1,9 +1,6 @@
 import { SessionId } from "../value-objects/SessionId";
-
 import { Result } from "../../shared/utils/Result";
-
-import { Session } from "inspector";
-
+import { Session } from "../entities/Session";
 import { UserId } from "../value-objects/UserId";
 
 export interface ISessionRepository {
