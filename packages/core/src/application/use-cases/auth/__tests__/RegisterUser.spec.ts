@@ -63,7 +63,7 @@ describe('RegisterUserUseCase', () => {
         password:'Test@123'
     }
     userRepository.exists.mockResolvedValue(Result.ok(false));
-    passwordHasher.validate.mockReturnValue(Result.ok(true));
+    passwordHasher.validate.mockReturnValue(Result.ok());
     passwordHasher.hash.mockResolvedValue(Result.ok('hashed-password'));
     userRepository.save.mockResolvedValue(Result.ok());
     tokenGenerator.generateAccessToken.mockResolvedValue(Result.ok('acces-token'))
@@ -110,7 +110,7 @@ it('should fail if password validation fails', async () => {
 
 it('should fail if access token generation fails', async () => {
   userRepository.exists.mockResolvedValue(Result.ok(false));
-  passwordHasher.validate.mockReturnValue(Result.ok(true));
+  passwordHasher.validate.mockReturnValue(Result.ok());
   passwordHasher.hash.mockResolvedValue(Result.ok('hashed-pass'));
   userRepository.save.mockResolvedValue(Result.ok());
 
