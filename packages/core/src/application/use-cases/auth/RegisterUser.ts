@@ -34,7 +34,7 @@ export class RegisterUserUseCase {
     private readonly eventBus:IEventBus,
   ) {}
 
-  async execute(dto: RegisterUserDto): Promise<Result<RegisterUserResult>> {
+    async execute(dto: RegisterUserDto): Promise<Result<RegisterUserResult>> {
     //1:>create and validate email
     const emailOrError = Email.create(dto.email);
     if (emailOrError.isFailure) return Result.fail(emailOrError.error);
