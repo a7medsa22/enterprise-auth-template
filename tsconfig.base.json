@@ -9,10 +9,10 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@auth-template/core": ["./dist/core"],
-      "@auth-template/core/*": ["./dist/core/*"],
-      "@auth-template/nestjs-adapter": ["./dist/nestjs-adapter"],
-      "@auth-template/nestjs-adapter/*": ["./dist/nestjs-adapter/*"]
+      "@auth-template/core": ["packages/core/dist"],
+      "@auth-template/core/*": ["packages/core/dist/*"],
+      "@auth-template/nestjs-adapter": ["packages/nestjs-adapter/dist"],
+      "@auth-template/nestjs-adapter/*": ["packages/nestjs-adapter/dist/*"]
     }
   },
 

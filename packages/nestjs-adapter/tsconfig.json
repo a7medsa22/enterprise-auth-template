@@ -2,8 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "../../dist/nestjs-adapter",
+    "outDir": "./dist",
     "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "composite": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true

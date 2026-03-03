@@ -1,8 +1,13 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
-import { LoginUser } from "@auth-template/core/application/use-cases/auth/LoginUser";
-import { RegisterUserUseCase } from "@auth-template/core/application/use-cases/auth/RegisterUser";
-import { RefreshTokenUseCase } from "@auth-template/core/application/use-cases/auth/RefreshToken";
+import {
+  LoginUser,
+  RegisterUserUseCase,
+  RefreshTokenUseCase,
+  LogoutUser,
+  LogoutAllDevices,
+  ChangePassword,
+} from "@auth-template/core";
 import { RegisterRequest } from "../dto/requests/RegisterRequest";
 import { AuthResponse } from "../dto/responses/AuthResponse";
 import { Public } from "../decorators/public.decorator";
@@ -19,6 +24,9 @@ export class AuthController {
         private readonly registerUser: RegisterUserUseCase,
         private readonly loginUser: LoginUser,
         private readonly refreshToken: RefreshTokenUseCase,
+        private readonly logoutUser: LogoutUser,
+    private readonly logoutAllDevices: LogoutAllDevices,
+    private readonly changePassword: ChangePassword,
     ) { }
     @Public()
     @Post('register')
@@ -47,6 +55,9 @@ export class AuthController {
             refreshToken: data.refreshToken,
         };
     }
+    @Public()
+    @Post('login')
+    @HttpCode(HttpStatus.OK)
     async login(@Body() dto: LoginRequest, @Req() req: Request): Promise<AuthResponse> {
         const result = await this.loginUser.execute({
             email: dto.email,
@@ -85,6 +96,55 @@ export class AuthController {
         }
 
         return result.getValue();
+    }
+
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    async logout(
+        @CurrentUser('userId') userId: string,
+        @Body() dto: RefreshTokenRequest,
+    ): Promise<{ message: string }> {
+        const result = await this.logoutUser.execute({
+            userId,
+            refreshToken: dto.refreshToken,
+        });
+
+        if (result.isFailure) {
+            throw new Error(result.error);
+        }
+
+        return { message: 'Logged out successfully' };
+    }
+
+    @Post('logout-all')
+    @HttpCode(HttpStatus.OK)
+    async logoutAll(@CurrentUser('userId') userId: string): Promise<{ message: string }> {
+        const result = await this.logoutAllDevices.execute({ userId });
+
+        if (result.isFailure) {
+            throw new Error(result.error);
+        }
+
+        return { message: 'Logged out from all devices' };
+    }
+
+    @Post('change-password')
+    @HttpCode(HttpStatus.OK)
+    async changePasswordHandler(
+        @CurrentUser('userId') userId: string,
+        @Body() dto: ChangePasswordRequest,
+    ): Promise<{ message: string }> {
+        const result = await this.changePassword.execute({
+            userId,
+            currentPassword: dto.currentPassword,
+            newPassword: dto.newPassword,
+        });
+
+        if (result.isFailure) {
+            throw new Error(result.error);
+        }
+
+        return { message: 'Password changed successfully' };
     }
 
     @Get('me')

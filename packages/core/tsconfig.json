@@ -5,6 +5,7 @@
     "lib": ["ES2021"],
     "declaration": true,
     "declarationMap": true,
+    "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
