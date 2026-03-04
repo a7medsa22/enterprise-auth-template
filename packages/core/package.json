@@ -2,8 +2,8 @@
   "name": "@auth-template/core",
   "version": "1.0.0",
   "description": "Framework-agnostic authentication core with Clean Architecture",
-  "main": "../dist/core/index.js",
-  "types": "../dist/core/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "README.md"
@@ -37,9 +37,9 @@
     "typescript": "^5.3.3"
   },
   "exports": {
-    ".": "../dist/core/index.js",
-    "./domain": "../dist/core/domain/index.js",
-    "./application": "../dist/core/application/index.js",
-    "./shared": "../dist/core/shared/index.js"
+    ".": "./dist/index.js",
+    "./domain": "./dist/domain/index.js",
+    "./application": "./dist/application/index.js",
+    "./shared": "./dist/shared/index.js"
   }
 }

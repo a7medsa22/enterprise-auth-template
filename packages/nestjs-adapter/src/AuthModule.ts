@@ -46,6 +46,10 @@ export interface AuthModuleOptions {
 @Module({})
 export class AuthModule {
     static forRoot(options: AuthModuleOptions = {}): DynamicModule {
+        if (options.cacheProvider === 'redis' && !options.redisClient) {
+            throw new Error('Redis client required for redis cache provider');
+        }
+
         const providers: Provider[] = [
             // Use Cases
             {
