@@ -244,5 +244,5 @@ export class AuthModule {
                 'ITokenGenerator',
             ],
         };
-    }
-}
+    } 
+} 
