@@ -1,7 +1,11 @@
 import 'reflect-metadata';
 import {
+  ArgumentsHost,
   CanActivate,
+  Catch,
+  ExceptionFilter,
   ExecutionContext,
+  HttpStatus,
   INestApplication,
   UnauthorizedException,
   ValidationPipe,
@@ -18,6 +22,24 @@ import {
 } from '@auth-template/core';
 import { AuthController } from '../packages/nestjs-adapter/src/presentation/controllers/AuthController';
 import { JwtAuthGuard } from '../packages/nestjs-adapter/src/presentation/guards/jwt-auth.guard';
+
+
+
+@Catch()
+class CrossPackageHttpExceptionFilter implements ExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    const response = host.switchToHttp().getResponse();
+    const status =
+      typeof exception?.getStatus === 'function'
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    const message =
+      typeof exception?.message === 'string' ? exception.message : 'Internal server error';
+
+    response.status(status).json({ statusCode: status, message });
+  }
+}
 
 class TestJwtAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
@@ -134,6 +156,7 @@ describe('Auth E2E Tests', () => {
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.useGlobalFilters(new CrossPackageHttpExceptionFilter());
     app.setGlobalPrefix('api');
     await app.init();
     await app.listen(0);
@@ -193,7 +216,7 @@ describe('Auth E2E Tests', () => {
         email: 'test@example.com',
         password: 'WrongPassword@123',
       });
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(401);
     });
   });
 
