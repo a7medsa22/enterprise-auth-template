@@ -84,8 +84,8 @@ export class AuthModule {
                 useFactory: (
                     userRepo: IUserRepository,
                     passwordHasher: IPasswordHasher,
-                    rateLimiter: IRateLimiter,
                     tokenGenerator: ITokenGenerator,
+                    rateLimiter: IRateLimiter,
                     logger: ILogger,
                     eventBus: IEventBus,
                 ) => new LoginUser(userRepo, passwordHasher, tokenGenerator, rateLimiter, logger, eventBus),
@@ -122,9 +122,13 @@ export class AuthModule {
             },
             {
                 provide: VerifyEmail,
-                useFactory: (userRepo: IUserRepository, eventBus: IEventBus, logger: ILogger) =>
-                    new VerifyEmail(userRepo, eventBus, logger),
-                inject: ['IUserRepository', 'IEventBus', 'ILogger'],
+                useFactory: (
+                    userRepo: IUserRepository,
+                    tokenGenerator: ITokenGenerator,
+                    eventBus: IEventBus,
+                    logger: ILogger,
+                ) => new VerifyEmail(userRepo, tokenGenerator, eventBus, logger),
+                inject: ['IUserRepository', 'ITokenGenerator', 'IEventBus', 'ILogger'],
             },
             {
                 provide: ChangePassword,

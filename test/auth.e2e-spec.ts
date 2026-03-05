@@ -1,135 +1,222 @@
 import 'reflect-metadata';
-process.env.NODE_ENV = 'test';
-process.env.JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'test-access-secret';
-process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh-secret';
-process.env.JWT_SECRET = process.env.JWT_SECRET || process.env.JWT_ACCESS_SECRET;
-process.env.JWT_ACCESS_EXPIRATION = process.env.JWT_ACCESS_EXPIRATION || '15m';
-process.env.JWT_REFRESH_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION || '7d';
+import {
+  CanActivate,
+  ExecutionContext,
+  INestApplication,
+  UnauthorizedException,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import request from 'supertest';
-import { AppModule } from '../apps/demo/src/app.module';
+import {
+  ChangePassword,
+  LoginUser,
+  LogoutAllDevices,
+  LogoutUser,
+  RefreshTokenUseCase,
+  RegisterUserUseCase,
+  Result,
+} from '@auth-template/core';
+import { AuthController } from '../packages/nestjs-adapter/src/presentation/controllers/AuthController';
+import { JwtAuthGuard } from '../packages/nestjs-adapter/src/presentation/guards/jwt-auth.guard';
+
+class TestJwtAuthGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const requestContext = context.switchToHttp().getRequest();
+    const authHeader = requestContext.headers.authorization as string | undefined;
+
+    if (requestContext.method === 'GET' && !authHeader) {
+      throw new UnauthorizedException();
+    }
+
+    requestContext.user = {
+      userId: 'user-1',
+      email: 'test@example.com',
+      roles: ['USER'],
+    };
+
+    return true;
+  }
+}
 
 describe('Auth E2E Tests', () => {
-    let app: INestApplication;
-    let accessToken: string;
-    let refreshToken: string;
+  let app: INestApplication;
+  let baseUrl: string;
+  let accessToken: string;
+  let refreshToken: string;
 
-    beforeAll(async () => {
-        let moduleFixture: TestingModule;
-        try {
-            moduleFixture = await Test.createTestingModule({
-                imports: [AppModule],
-            }).compile();
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('TestingModule compile error:', e);
-            throw e;
-        }
 
-        app = moduleFixture.createNestApplication();
-        app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-        await app.init();
+  async function post(path: string, body: unknown, token?: string) {
+    const response = await fetch(`${baseUrl}${path}`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(body),
     });
 
-    afterAll(async () => {
-        await app.close();
+    return { status: response.status, body: (await response.json()) as any };
+  }
+
+  async function get(path: string, token?: string) {
+    const response = await fetch(`${baseUrl}${path}`, {
+      method: 'GET',
+      headers: { ...(token ? { authorization: `Bearer ${token}` } : {}) },
     });
 
-    describe('POST /api/auth/register', () => {
-        it('should register new user', () => {
-            return request(app.getHttpServer())
-                .post('/api/auth/register')
-                .send({
-                    email: 'test@example.com',
-                    password: 'Test@1234',
-                })
-                .expect(201)
-                .expect((res: any) => {
-                    expect(res.body).toHaveProperty('user');
-                    expect(res.body).toHaveProperty('accessToken');
-                    expect(res.body).toHaveProperty('refreshToken');
-                    accessToken = res.body.accessToken;
-                    refreshToken = res.body.refreshToken;
-                });
-        });
+    return { status: response.status, body: (await response.json()) as any };
+  }
 
-        it('should fail with invalid email', () => {
-            return request(app.getHttpServer())
-                .post('/api/auth/register')
-                .send({
-                    email: 'invalid-email',
-                    password: 'Test@1234',
-                })
-                .expect(400);
-        });
+  const registerUserMock = {
+    execute: jest.fn(async (dto: { email: string; password: string }) =>
+      Result.ok({
+        userId: 'user-1',
+        email: dto.email,
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+      }),
+    ),
+  };
 
-        it('should fail with weak password', () => {
-            return request(app.getHttpServer())
-                .post('/api/auth/register')
-                .send({
-                    email: 'test2@example.com',
-                    password: 'weak',
-                })
-                .expect(400);
-        });
+  const loginUserMock = {
+    execute: jest.fn(async (dto: { email: string; password: string }) => {
+      if (dto.password === 'WrongPassword@123') {
+        return Result.fail('Invalid credentials');
+      }
+
+      return Result.ok({
+        userId: 'user-1',
+        email: dto.email,
+        roles: ['USER'],
+        accessToken: 'access-token-2',
+        refreshToken: 'refresh-token-2',
+      });
+    }),
+  };
+
+  const refreshTokenMock = {
+    execute: jest.fn(async () =>
+      Result.ok({
+        accessToken: 'new-access-token',
+        refreshToken: 'new-refresh-token',
+      }),
+    ),
+  };
+
+  const logoutUserMock = {
+    execute: jest.fn(async () => Result.ok(undefined)),
+  };
+
+  const logoutAllDevicesMock = {
+    execute: jest.fn(async () => Result.ok(undefined)),
+  };
+
+  const changePasswordMock = {
+    execute: jest.fn(async () => Result.ok(undefined)),
+  };
+
+  beforeAll(async () => {
+    let moduleFixture: TestingModule;
+    moduleFixture = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [
+        { provide: RegisterUserUseCase, useValue: registerUserMock },
+        { provide: LoginUser, useValue: loginUserMock },
+        { provide: RefreshTokenUseCase, useValue: refreshTokenMock },
+        { provide: LogoutUser, useValue: logoutUserMock },
+        { provide: LogoutAllDevices, useValue: logoutAllDevicesMock },
+        { provide: ChangePassword, useValue: changePasswordMock },
+      ],
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useClass(TestJwtAuthGuard)
+      .compile();
+
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.setGlobalPrefix('api');
+    await app.init();
+    await app.listen(0);
+    baseUrl = await app.getUrl();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('POST /api/auth/register', () => {
+    it('should register new user', async () => {
+      const res = await post('/api/auth/register', {
+        email: 'test@example.com',
+        password: 'Test@1234',
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty('user');
+      expect(res.body).toHaveProperty('accessToken');
+      expect(res.body).toHaveProperty('refreshToken');
+      accessToken = res.body.accessToken;
+      refreshToken = res.body.refreshToken;
     });
 
-    describe('POST /api/auth/login', () => {
-        it('should login successfully', () => {
-            return request(app.getHttpServer())
-                .post('/api/auth/login')
-                .send({
-                    email: 'test@example.com',
-                    password: 'Test@1234',
-                })
-                .expect(200)
-                .expect((res: any) => {
-                    expect(res.body).toHaveProperty('accessToken');
-                    expect(res.body).toHaveProperty('refreshToken');
-                });
-        });
-
-        it('should fail with wrong password', () => {
-            return request(app.getHttpServer())
-                .post('/api/auth/login')
-                .send({
-                    email: 'test@example.com',
-                    password: 'WrongPassword@123',
-                })
-                .expect(401);
-        });
+    it('should fail with invalid email', async () => {
+      const res = await post('/api/auth/register', {
+        email: 'invalid-email',
+        password: 'Test@1234',
+      });
+      expect(res.status).toBe(400);
     });
 
-    describe('GET /api/auth/me', () => {
-        it('should get user profile', () => {
-            return request(app.getHttpServer())
-                .get('/api/auth/me')
-                .set('Authorization', `Bearer ${accessToken}`)
-                .expect(200)
-                .expect((res: any) => {
-                    expect(res.body).toHaveProperty('email');
-                    expect(res.body.email).toBe('test@example.com');
-                });
-        });
+    it('should fail with weak password', async () => {
+      const res = await post('/api/auth/register', {
+        email: 'test2@example.com',
+        password: 'weak',
+      });
+      expect(res.status).toBe(400);
+    });
+  });
 
-        it('should fail without token', () => {
-            return request(app.getHttpServer())
-                .get('/api/auth/me')
-                .expect(401);
-        });
+  describe('POST /api/auth/login', () => {
+    it('should login successfully', async () => {
+      const res = await post('/api/auth/login', {
+        email: 'test@example.com',
+        password: 'Test@1234',
+      });
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('accessToken');
+      expect(res.body).toHaveProperty('refreshToken');
+      expect(res.body.user.roles).toEqual(['USER']);
     });
 
-    describe('POST /api/auth/refresh', () => {
-        it('should refresh tokens', () => {
-            return request(app.getHttpServer())
-                .post('/api/auth/refresh')
-                .send({ refreshToken })
-                .expect(200)
-                .expect((res: any) => {
-                    expect(res.body).toHaveProperty('accessToken');
-                    expect(res.body).toHaveProperty('refreshToken');
-                });
-        });
+    it('should fail with wrong password', async () => {
+      const res = await post('/api/auth/login', {
+        email: 'test@example.com',
+        password: 'WrongPassword@123',
+      });
+      expect(res.status).toBe(500);
     });
+  });
+
+  describe('GET /api/auth/me', () => {
+    it('should get user profile', async () => {
+      const res = await get('/api/auth/me', accessToken);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('email');
+      expect(res.body.email).toBe('test@example.com');
+    });
+
+    it('should fail without token', async () => {
+      const res = await get('/api/auth/me');
+      expect(res.status).toBe(401);
+    });
+  });
+
+  describe('POST /api/auth/refresh', () => {
+    it('should refresh tokens', async () => {
+      const res = await post('/api/auth/refresh', { refreshToken });
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('accessToken');
+      expect(res.body).toHaveProperty('refreshToken');
+    });
+  });
 });

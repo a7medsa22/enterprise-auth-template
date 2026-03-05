@@ -21,7 +21,7 @@ export interface LoginUserDTO {
 export interface LoginUserResult {
   userId: string;
   email: string;
-  role: string[];
+  roles: string[];
   accessToken: string;
   refreshToken: string;
 }
@@ -145,7 +145,7 @@ export class LoginUser {
     return Result.ok({
       userId: user.id.getValue(),
       email: user.getEmail().getValue(),
-      role: user.getRoles(),
+      roles: user.getRoles(),
       accessToken: accessTokenOrError.getValue(),
       refreshToken: refreshTokenOrError.getValue(),
     });

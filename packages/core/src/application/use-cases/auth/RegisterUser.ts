@@ -111,10 +111,12 @@ export class RegisterUserUseCase {
       this.logger.error('Failed to generate refresh token', new Error(refreshTokenOrError.error));
       return Result.fail('Unable to complete registration');
     }
-    //:>send verification email
-     this.emailSender.sendVerificationEmail(email.getValue(), 'token').catch(err => {
+    //:>send verification email with a signed token
+    this.emailSender
+      .sendVerificationEmail(email.getValue(), accessTokenOrError.getValue())
+      .catch(err => {
       this.logger.error('Failed to send verification email', err);
-    });
+      });
 
     //:> Publish event
     await this.eventBus.publish(new UserRegisteredEvent(user.id,email));
