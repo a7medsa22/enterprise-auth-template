@@ -1,6 +1,5 @@
-import { IPasswordHasher } from "@auth-template/core/application/ports/IpasswordHasher";
-import { Result } from "@auth-template/core/shared/utils/Result";
-import { PasswordValidator } from '@auth-template/core/shared/utils/PasswordValidator';
+import { IPasswordHasher } from "@auth-template/core/application";
+import { Result, PasswordValidator } from "@auth-template/core";
 import { Injectable } from "@nestjs/common";
 import * as argon2 from 'argon2';
 

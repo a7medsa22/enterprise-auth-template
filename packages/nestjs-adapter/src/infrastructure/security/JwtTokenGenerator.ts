@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { ITokenGenerator, TokenPayload } from "@auth-template/core/application/ports/ITokenGenerator";
-import { Result } from "@auth-template/core/shared/utils/Result";
+import { ITokenGenerator, TokenPayload } from "@auth-template/core/application";
+import { Result } from "@auth-template/core";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { UserId } from "@auth-template/core/domain/value-objects/UserId";
+import { UserId } from "@auth-template/core/domain";
 import { randomUUID } from 'crypto';
 
 @Injectable()

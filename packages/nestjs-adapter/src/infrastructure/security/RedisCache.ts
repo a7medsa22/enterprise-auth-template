@@ -1,8 +1,8 @@
-import { Result } from "@auth-template/core/shared/utils/Result";
+import { Result } from "@auth-template/core";
 import { Injectable } from "@nestjs/common/decorators/core/injectable.decorator";
 import { Inject } from "@nestjs/common/decorators/core/inject.decorator";
 import { Redis } from "ioredis";
-import { ICacheProvider, CacheOptions } from "@auth-template/core/application/ports/ICacheProvider";
+import { ICacheProvider, CacheOptions } from "@auth-template/core/application";
 @Injectable()
 export class RedisCache implements ICacheProvider {
     constructor(

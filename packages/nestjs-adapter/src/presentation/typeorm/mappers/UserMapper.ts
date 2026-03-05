@@ -1,7 +1,7 @@
-import { User, Role } from '@auth-template/core/domain/entities/User';
-import { UserId } from '@auth-template/core/domain/value-objects/UserId';
-import { Email } from '@auth-template/core/domain/value-objects/Email';
-import { Password } from '@auth-template/core/domain/value-objects/Password';
+import { User, Role } from '@auth-template/core/domain';
+import { UserId } from '@auth-template/core/domain';
+import { Email } from '@auth-template/core/domain';
+import { Password } from '@auth-template/core/domain';
 import { UserEntity } from '../entities/UserEntity';
 
 export class UserMapper {

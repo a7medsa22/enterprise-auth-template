@@ -1,5 +1,5 @@
-import { CacheOptions, ICacheProvider } from "@auth-template/core/application/ports/ICacheProvider";
-import { Result } from "@auth-template/core/shared/utils/Result";
+import { CacheOptions, ICacheProvider } from "@auth-template/core/application";
+import { Result } from "@auth-template/core";
 import { Injectable } from "@nestjs/common/decorators/core/injectable.decorator";
 
 interface CacheEntry<T> {

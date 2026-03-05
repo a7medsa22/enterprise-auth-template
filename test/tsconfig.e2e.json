@@ -1,0 +1,23 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["**/*.e2e-spec.ts", "**/*.ts"],
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2019",
+    "types": ["node", "jest"],
+    "typeRoots": [
+      "../node_modules/@types",
+      "../apps/demo/node_modules/@types"
+    ],
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "*": ["../apps/demo/node_modules/*", "../node_modules/*"],
+      "@auth-template/core": ["../packages/core/src"],
+      "@auth-template/core/*": ["../packages/core/src/*"],
+      "@auth-template/nestjs-adapter": ["../packages/nestjs-adapter/src"],
+      "@auth-template/nestjs-adapter/*": ["../packages/nestjs-adapter/src/*"]
+    }
+  }
+}

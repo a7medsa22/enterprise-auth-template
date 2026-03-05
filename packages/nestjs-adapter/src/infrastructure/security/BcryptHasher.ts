@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { IPasswordHasher } from '@auth-template/core/application/ports/IpasswordHasher'
-import { Result } from "@auth-template/core/shared/utils/Result";
-import { PasswordValidator } from '@auth-template/core/shared/utils/PasswordValidator';
+import { IPasswordHasher } from '@auth-template/core/application'
+import { Result, PasswordValidator } from "@auth-template/core";
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from "@nestjs/config";
 
@@ -25,7 +24,7 @@ export class BcryptHasher implements IPasswordHasher {
     async compare(password: string, hashed: string): Promise<Result<boolean>> {
         try {
             const isMatch = await bcrypt.compare(password, hashed);
-            return Result.ok()
+            return Result.ok(isMatch)
         } catch (error) {
             return Result.fail(`Failed to compare passwords: ${error}`);
         }

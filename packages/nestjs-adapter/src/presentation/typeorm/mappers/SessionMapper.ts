@@ -1,7 +1,7 @@
-import { Session } from '@auth-template/core/domain/entities/Session';
-import { SessionId } from '@auth-template/core/domain/value-objects/SessionId';
-import { UserId } from '@auth-template/core/domain/value-objects/UserId';
-import { IPAddress } from '@auth-template/core/domain/value-objects/IpAddress';
+import { Session } from '@auth-template/core/domain';
+import { SessionId } from '@auth-template/core/domain';
+import { UserId } from '@auth-template/core/domain';
+import { IPAddress } from '@auth-template/core/domain';
 import { SessionEntity } from '../entities/SessionEntity';
 
 export class SessionMapper {

@@ -1,4 +1,4 @@
-import { ILogger } from "@auth-template/core/application/ports";
+import { ILogger } from "@auth-template/core/application";
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
 
 @Catch()

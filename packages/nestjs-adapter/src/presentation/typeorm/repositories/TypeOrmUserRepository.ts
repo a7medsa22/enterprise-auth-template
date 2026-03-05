@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { IUserRepository } from '@auth-template/core/domain/repositories/IUserRepository';
+import { IUserRepository } from '@auth-template/core/domain';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../entities/UserEntity';
-import { User } from '@auth-template/core/domain/entities/User';
-import { Email } from '@auth-template/core/domain/value-objects/Email';
-import { Result } from '@auth-template/core/shared/utils/Result';
-import { UserId } from '@auth-template/core/domain/value-objects/UserId';
+import { User } from '@auth-template/core/domain';
+import { Email } from '@auth-template/core/domain';
+import { Result } from '@auth-template/core';
+import { UserId } from '@auth-template/core/domain';
 import { UserMapper } from '../mappers/UserMapper';
+import { InjectRepository } from '@nestjs/typeorm';
 
 
 @Injectable()
 export class TypeOrmUserRepository implements IUserRepository {
     constructor(
+        @InjectRepository(UserEntity)
         private readonly repository: Repository<UserEntity>,
     ) { }
 
@@ -58,7 +60,7 @@ export class TypeOrmUserRepository implements IUserRepository {
         try {
             const entity = UserMapper.toPersistence(user);
             await this.repository.save(entity);
-            return Result.ok();
+            return Result.ok(user);
         } catch (error) {
             return Result.fail(`Failed to update user: ${error}`);
         }

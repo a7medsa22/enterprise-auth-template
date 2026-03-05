@@ -1,4 +1,4 @@
-import { IRateLimiter } from "@auth-template/core/application/ports/IRateLimiter";
+import { IRateLimiter } from "@auth-template/core/application";
 import { NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from 'express';
 export class RateLimitMiddleware implements NestMiddleware {

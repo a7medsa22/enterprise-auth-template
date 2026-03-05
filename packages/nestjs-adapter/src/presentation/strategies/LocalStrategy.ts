@@ -1,6 +1,6 @@
 import { PassportStrategy } from "@nestjs/passport";
-import { Strategy } from "passport-jwt";
-import { LoginUser } from '@auth-template/core/application/use-cases/auth/LoginUser';
+import { Strategy } from "passport-local";
+import { LoginUser } from '@auth-template/core/application';
 
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     constructor(private loginUser: LoginUser) {
