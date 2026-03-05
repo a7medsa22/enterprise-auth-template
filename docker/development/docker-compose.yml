@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: auth_postgres_dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - auth_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: auth_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - auth_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  demo-api:
+    build:
+      context: ../../
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: auth_demo_api_dev
+    ports:
+      - "${PORT:-3005}:3000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: auth_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: dev-access-secret-change-me
+      JWT_REFRESH_SECRET: dev-refresh-secret-change-me
+    volumes:
+      - ../../apps/demo-api:/app/apps/demo-api
+      - ../../packages:/app/packages
+      - /app/node_modules
+      - /app/apps/demo-api/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - auth_network
+    command: npm run start:dev
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  auth_network:
+    driver: bridge
