@@ -15,9 +15,9 @@
     "incremental": true,
     "composite": true,
     "paths": {
-      "@auth-template/core": ["./packages/core/src"],
+      "@auth-template/core": ["./packages/core/src/index"],
       "@auth-template/core/*": ["./packages/core/src/*"],
-      "@auth-template/nestjs-adapter": ["./packages/nestjs-adapter/src"],
+      "@auth-template/nestjs-adapter": ["./packages/nestjs-adapter/src/index"],
       "@auth-template/nestjs-adapter/*": ["./packages/nestjs-adapter/src/*"]
     }
   },

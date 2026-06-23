@@ -18,6 +18,9 @@
     "test": "pnpm -r run test",
     "test:watch": "pnpm -r run test:watch",
     "test:cov": "pnpm -r run test:cov",
+    "test:integration:up": "docker-compose -f docker/testing/docker-compose.test.yml up -d",
+    "test:integration:down": "docker-compose -f docker/testing/docker-compose.test.yml down",
+    "test:integration": "pnpm --filter \"demo-api\" run test:integration",
     "test:e2e": "pnpm --filter \"demo-api\" run test:e2e",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
@@ -31,6 +34,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/core": "^10.3.0",
+    "@nestjs/testing": "^10.3.0",
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
@@ -45,6 +51,12 @@
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=8.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@nestjs/common": "10.4.22",
+      "@nestjs/core": "10.4.22"
+    }
   },
   "packageManager": "pnpm@9.0.0"
 }

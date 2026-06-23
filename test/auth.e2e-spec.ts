@@ -19,11 +19,10 @@ import {
   RefreshTokenUseCase,
   RegisterUserUseCase,
   Result,
+  VerifyEmail,
 } from '@auth-template/core';
-import { AuthController } from '../packages/nestjs-adapter/src/presentation/controllers/AuthController';
-import { JwtAuthGuard } from '../packages/nestjs-adapter/src/presentation/guards/jwt-auth.guard';
-
-
+import { AuthController } from '@auth-template/nestjs-adapter/presentation/controllers/AuthController';
+import { JwtAuthGuard } from '@auth-template/nestjs-adapter/presentation/guards/jwt-auth.guard';
 
 @Catch()
 class CrossPackageHttpExceptionFilter implements ExceptionFilter {
@@ -65,7 +64,6 @@ describe('Auth E2E Tests', () => {
   let baseUrl: string;
   let accessToken: string;
   let refreshToken: string;
-
 
   async function post(path: string, body: unknown, token?: string) {
     const response = await fetch(`${baseUrl}${path}`, {
@@ -134,7 +132,21 @@ describe('Auth E2E Tests', () => {
   };
 
   const changePasswordMock = {
-    execute: jest.fn(async () => Result.ok(undefined)),
+    execute: jest.fn(async (dto: any) => {
+      if (dto.currentPassword === 'WrongPassword@123') {
+        return Result.fail('Invalid current password');
+      }
+      return Result.ok(undefined);
+    }),
+  };
+
+  const verifyEmailMock = {
+    execute: jest.fn(async (dto: any) => {
+      if (dto.verificationToken === 'invalid-token') {
+        return Result.fail('Invalid or expired verification token');
+      }
+      return Result.ok({ success: true, message: 'Email verified successfully' });
+    }),
   };
 
   beforeAll(async () => {
@@ -148,6 +160,7 @@ describe('Auth E2E Tests', () => {
         { provide: LogoutUser, useValue: logoutUserMock },
         { provide: LogoutAllDevices, useValue: logoutAllDevicesMock },
         { provide: ChangePassword, useValue: changePasswordMock },
+        { provide: VerifyEmail, useValue: verifyEmailMock },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -240,6 +253,50 @@ describe('Auth E2E Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('accessToken');
       expect(res.body).toHaveProperty('refreshToken');
+    });
+  });
+
+  describe('POST /api/auth/logout', () => {
+    it('should logout successfully', async () => {
+      const res = await post('/api/auth/logout', { refreshToken }, accessToken);
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Logged out successfully');
+    });
+  });
+
+  describe('POST /api/auth/logout-all', () => {
+    it('should logout from all devices', async () => {
+      const res = await post('/api/auth/logout-all', {}, accessToken);
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Logged out from all devices');
+    });
+  });
+
+  describe('POST /api/auth/change-password', () => {
+    it('should change password successfully', async () => {
+      const res = await post(
+        '/api/auth/change-password',
+        {
+          currentPassword: 'Test@1234',
+          newPassword: 'NewPassword@123',
+        },
+        accessToken,
+      );
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Password changed successfully');
+    });
+
+    it('should fail with wrong current password', async () => {
+      const res = await post(
+        '/api/auth/change-password',
+        {
+          currentPassword: 'WrongPassword@123',
+          newPassword: 'NewPassword@123',
+        },
+        accessToken,
+      );
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe('Invalid current password');
     });
   });
 });

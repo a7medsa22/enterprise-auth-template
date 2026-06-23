@@ -42,7 +42,7 @@ export class UserMapper {
     entity.roles = user.getRoles();
     entity.isActive = user.isActive();
     entity.emailVerified = user.isEmailVerified();
-    entity.lastLoginAt = user.getLastLoginAt() || null;
+    entity.lastLoginAt = user.getLastLoginAt() || undefined;
     entity.createdAt = user.getCreatedAt();
     entity.updatedAt = user.getUpdatedAt();
     return entity;

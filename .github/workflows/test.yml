@@ -65,6 +65,17 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
 
+      - name: Run integration tests
+        run: pnpm run test:integration
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: auth_db_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
       - name: Run e2e tests
         run: pnpm run test:e2e
         env:

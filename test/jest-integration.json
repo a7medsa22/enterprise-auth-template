@@ -2,7 +2,7 @@
   "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": ".",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testRegex": ".integration-spec.ts$",
   "moduleDirectories": ["node_modules", "<rootDir>/../apps/demo/node_modules"],
   "moduleNameMapper": {
     "^@auth-template/nestjs-adapter$": "<rootDir>/../packages/nestjs-adapter/src/index",

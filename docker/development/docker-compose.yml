@@ -56,10 +56,10 @@ services:
       JWT_ACCESS_SECRET: dev-access-secret-change-me
       JWT_REFRESH_SECRET: dev-refresh-secret-change-me
     volumes:
-      - ../../apps/demo-api:/app/apps/demo-api
+      - ../../apps/demo:/app/apps/demo
       - ../../packages:/app/packages
       - /app/node_modules
-      - /app/apps/demo-api/node_modules
+      - /app/apps/demo/node_modules
     depends_on:
       postgres:
         condition: service_healthy

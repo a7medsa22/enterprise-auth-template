@@ -17,7 +17,7 @@ export class RefreshTokenEntity {
   @Column({ type: 'boolean', default: false })
   isRevoked!: boolean;
 
-  @Column({ type: 'timestamp' })
+  @Column()
   expiresAt!: Date;
 
   @CreateDateColumn()

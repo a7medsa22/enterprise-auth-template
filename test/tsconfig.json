@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig.e2e.json",
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "../apps/demo/src/**/*.ts", "../packages/nestjs-adapter/src/**/*.ts"]
 }

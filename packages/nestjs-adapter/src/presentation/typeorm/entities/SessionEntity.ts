@@ -19,10 +19,10 @@ export class SessionEntity {
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
-  @Column({ type: 'timestamp' })
+  @Column()
   expiresAt!: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column()
   lastActivityAt!: Date;
 
   @CreateDateColumn()

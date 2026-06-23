@@ -12,7 +12,7 @@ FROM base AS dependencies
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/core/package.json ./packages/core/
 COPY packages/nestjs-adapter/package.json ./packages/nestjs-adapter/
-COPY apps/demo-api/package.json ./apps/demo-api/
+COPY apps/demo/package.json ./apps/demo/
 
 RUN pnpm install --frozen-lockfile
 
@@ -46,7 +46,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/core/package.json ./packages/core/
 COPY packages/nestjs-adapter/package.json ./packages/nestjs-adapter/
-COPY apps/demo-api/package.json ./apps/demo-api/
+COPY apps/demo/package.json ./apps/demo/
 
 # Install production dependencies only
 RUN pnpm install --frozen-lockfile --prod
@@ -54,11 +54,11 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy built artifacts only (not source code)
 COPY --from=build /app/packages/core/dist ./packages/core/dist
 COPY --from=build /app/packages/nestjs-adapter/dist ./packages/nestjs-adapter/dist
-COPY --from=build /app/apps/demo-api/dist ./apps/demo-api/dist
+COPY --from=build /app/apps/demo/dist ./apps/demo/dist
 
 # Switch to non-root user
 USER appuser
 
 EXPOSE 3000
 
-CMD ["node", "apps/demo-api/dist/main.js"]
+CMD ["node", "apps/demo/dist/main.js"]

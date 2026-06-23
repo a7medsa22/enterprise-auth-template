@@ -20,8 +20,8 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   emailVerified!: boolean;
 
-  @Column({ type: 'timestamp', nullable: true })
-  lastLoginAt!: Date | null;
+  @Column({ nullable: true })
+  lastLoginAt?: Date;
 
   @CreateDateColumn()
   createdAt!: Date;
