@@ -11,13 +11,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install pnpm
-        run: npm install -g pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -34,8 +36,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'dist/,node_modules/,package.json,package-lock.json,pnpm-lock.yaml'
-          target: '/var/www/auth-backend'
+          source: 'dist/,node_modules/,package.json,pnpm-lock.yaml'
+          target: '/home/ubuntu/var/www/auth-backend'
 
       - name: Restart PM2 on EC2
         uses: appleboy/ssh-action@master
@@ -44,5 +46,5 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /var/www/auth-backend
+            cd /home/ubuntu/var/www/auth-backend
             pm2 restart auth-backend-app || pm2 start dist/main.js --name "auth-backend-app"
