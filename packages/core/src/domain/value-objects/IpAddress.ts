@@ -1,4 +1,4 @@
-import { Result } from "../../shared/utils/Result";
+import { Result } from '../../shared/utils/Result';
 
 export class IPAddress {
   private readonly value: string;
@@ -34,7 +34,7 @@ export class IPAddress {
     if (!ipv4Regex.test(ip)) return false;
 
     const parts = ip.split('.');
-    return parts.every(part => {
+    return parts.every((part) => {
       const num = parseInt(part, 10);
       return num >= 0 && num <= 255;
     });
@@ -45,7 +45,6 @@ export class IPAddress {
     return ipv6Regex.test(ip);
   }
 
-  
   public getValue(): string {
     return this.value;
   }

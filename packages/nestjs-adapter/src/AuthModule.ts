@@ -23,7 +23,6 @@ import { BcryptHasher } from './infrastructure/security/BcryptHasher';
 import { JwtStrategy } from './presentation/strategies/JwtStrategy';
 import { LocalStrategy } from './presentation/strategies/LocalStrategy';
 import { JwtAuthGuard } from './presentation/guards/jwt-auth.guard';
-import { LocalAuthGuard } from './presentation/guards/local-auth.guard';
 import { RolesGuard } from './presentation/guards/roles.guard';
 import { RedisCache } from './infrastructure/security/RedisCache';
 import { MemoryCache } from './infrastructure/security/MemoryCache';
@@ -229,13 +228,10 @@ export class AuthModule {
     providers.push(NodemailerEmailSender);
 
     if (options.cacheProvider === 'redis') {
-      providers.push(
-        EmailProcessor,
-        {
-          provide: 'IEmailSender',
-          useClass: QueueEmailSender,
-        },
-      );
+      providers.push(EmailProcessor, {
+        provide: 'IEmailSender',
+        useClass: QueueEmailSender,
+      });
     } else {
       providers.push({
         provide: 'IEmailSender',

@@ -1,15 +1,15 @@
-import { DomainError } from "./DomainError";
+import { DomainError } from './DomainError';
 
 export class AuthenticationError extends DomainError {
-    constructor(message: string = 'Authentication error') {
-        super(message);
-    }
+  constructor(message: string = 'Authentication error') {
+    super(message);
+  }
 }
 
 export class InvalidCredentialsError extends AuthenticationError {
-    constructor() {
-        super('Invalid credentials');
-    }
+  constructor() {
+    super('Invalid credentials');
+  }
 }
 
 export class AccountLockedError extends AuthenticationError {

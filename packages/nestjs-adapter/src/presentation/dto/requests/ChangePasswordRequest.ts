@@ -11,7 +11,8 @@ export class ChangePasswordRequest {
   currentPassword!: string;
 
   @ApiProperty({
-    description: 'New password of the user (must contain uppercase, lowercase, number, and special character)',
+    description:
+      'New password of the user (must contain uppercase, lowercase, number, and special character)',
     minLength: 8,
     maxLength: 128,
     example: 'NewSecurePass@123',

@@ -5,7 +5,6 @@ import { IEmailSender, ILogger, IPasswordHasher, ITokenGenerator } from '../../.
 import { RegisterUserUseCase } from '../RegisterUser';
 
 describe('RegisterUserUseCase', () => {
-
   let registerUser: RegisterUserUseCase;
 
   const userRepository = jest.mocked({
@@ -16,33 +15,33 @@ describe('RegisterUserUseCase', () => {
     update: jest.fn(),
     delete: jest.fn(),
     count: jest.fn(),
-  } as unknown as IUserRepository)
+  } as unknown as IUserRepository);
 
   const emailSender = jest.mocked({
     sendVerificationEmail: jest.fn(),
     send: jest.fn(),
     sendPasswordResetEmail: jest.fn(),
     sendWelcomeEmail: jest.fn(),
-  } as unknown as IEmailSender)
+  } as unknown as IEmailSender);
 
   const passwordHasher = jest.mocked({
     validate: jest.fn(),
     hash: jest.fn(),
-  } as unknown as IPasswordHasher)
-  
+  } as unknown as IPasswordHasher);
+
   const tokenGenerator = jest.mocked({
     generateAccessToken: jest.fn(),
     generateRefreshToken: jest.fn(),
-  } as unknown as ITokenGenerator)
-  
+  } as unknown as ITokenGenerator);
+
   const logger = jest.mocked({
     error: jest.fn(),
     info: jest.fn(),
-  } as unknown as ILogger)
+  } as unknown as ILogger);
 
   const eventBus = jest.mocked({
     publish: jest.fn(),
-  } as unknown as IEventBus)
+  } as unknown as IEventBus);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -57,73 +56,71 @@ describe('RegisterUserUseCase', () => {
     );
   });
 
-  it('should register user successfully',async()=>{
+  it('should register user successfully', async () => {
     const dto = {
-        email:'test@example.com',
-        password:'Test@123'
-    }
+      email: 'test@example.com',
+      password: 'Test@123',
+    };
     userRepository.exists.mockResolvedValue(Result.ok(false));
     passwordHasher.validate.mockReturnValue(Result.ok());
     passwordHasher.hash.mockResolvedValue(Result.ok('hashed-password'));
     userRepository.save.mockResolvedValue(Result.ok());
-    tokenGenerator.generateAccessToken.mockResolvedValue(Result.ok('acces-token'))
-    tokenGenerator.generateRefreshToken.mockResolvedValue(Result.ok('refresh-token'))
+    tokenGenerator.generateAccessToken.mockResolvedValue(Result.ok('acces-token'));
+    tokenGenerator.generateRefreshToken.mockResolvedValue(Result.ok('refresh-token'));
     emailSender.sendVerificationEmail.mockResolvedValue(Result.ok());
 
     const result = await registerUser.execute(dto);
 
     expect(result.isSuccess).toBe(true);
-    expect(result.getValue().email).toBe(dto.email)
-    expect(result.getValue().accessToken).toBe('acces-token')
-    expect(result.getValue().refreshToken).toBe('refresh-token')
-    
-    expect(userRepository.save).toHaveBeenCalled()
+    expect(result.getValue().email).toBe(dto.email);
+    expect(result.getValue().accessToken).toBe('acces-token');
+    expect(result.getValue().refreshToken).toBe('refresh-token');
+
+    expect(userRepository.save).toHaveBeenCalled();
   });
   it('should fail if user already exists', async () => {
-  userRepository.exists.mockResolvedValue(Result.ok(true));
+    userRepository.exists.mockResolvedValue(Result.ok(true));
 
-  const result = await registerUser.execute({
-    email: 'test@test.com',
-    password: 'password123',
+    const result = await registerUser.execute({
+      email: 'test@test.com',
+      password: 'password123',
+    });
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error).toBe('User with this email already exists');
+
+    expect(userRepository.save).not.toHaveBeenCalled();
   });
 
-  expect(result.isFailure).toBe(true);
-  expect(result.error).toBe('User with this email already exists');
+  it('should fail if password validation fails', async () => {
+    userRepository.exists.mockResolvedValue(Result.ok(false));
+    passwordHasher.validate.mockReturnValue(Result.fail('Weak password'));
 
-  expect(userRepository.save).not.toHaveBeenCalled();
-});
+    const result = await registerUser.execute({
+      email: 'test@test.com',
+      password: '123',
+    });
 
-it('should fail if password validation fails', async () => {
-  userRepository.exists.mockResolvedValue(Result.ok(false));
-  passwordHasher.validate.mockReturnValue(Result.fail('Weak password'));
+    expect(result.isFailure).toBe(true);
+    expect(result.error).toBe('Weak password');
 
-  const result = await registerUser.execute({
-    email: 'test@test.com',
-    password: '123',
+    expect(passwordHasher.hash).not.toHaveBeenCalled();
   });
 
-  expect(result.isFailure).toBe(true);
-  expect(result.error).toBe('Weak password');
+  it('should fail if access token generation fails', async () => {
+    userRepository.exists.mockResolvedValue(Result.ok(false));
+    passwordHasher.validate.mockReturnValue(Result.ok());
+    passwordHasher.hash.mockResolvedValue(Result.ok('hashed-pass'));
+    userRepository.save.mockResolvedValue(Result.ok());
 
-  expect(passwordHasher.hash).not.toHaveBeenCalled();
-});
+    tokenGenerator.generateAccessToken.mockResolvedValue(Result.fail('jwt error'));
 
-it('should fail if access token generation fails', async () => {
-  userRepository.exists.mockResolvedValue(Result.ok(false));
-  passwordHasher.validate.mockReturnValue(Result.ok());
-  passwordHasher.hash.mockResolvedValue(Result.ok('hashed-pass'));
-  userRepository.save.mockResolvedValue(Result.ok());
+    const result = await registerUser.execute({
+      email: 'test@test.com',
+      password: 'password123',
+    });
 
-  tokenGenerator.generateAccessToken.mockResolvedValue(Result.fail('jwt error'));
-
-  const result = await registerUser.execute({
-    email: 'test@test.com',
-    password: 'password123',
+    expect(result.isFailure).toBe(true);
+    expect(result.error).toBe('Unable to complete registration');
   });
-
-  expect(result.isFailure).toBe(true);
-  expect(result.error).toBe('Unable to complete registration');
-});
-
-
 });

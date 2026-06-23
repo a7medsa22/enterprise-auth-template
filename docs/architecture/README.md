@@ -17,6 +17,7 @@ Dependencies point inward:
 ### 2. Framework Independence
 
 Core has zero framework dependencies. You can:
+
 - Switch from NestJS to Express
 - Change from TypeORM to Prisma
 - Replace Redis with Memcached
@@ -24,6 +25,7 @@ Core has zero framework dependencies. You can:
 ### 3. Testability
 
 Every layer tested independently:
+
 - Domain: Pure unit tests
 - Application: Mock repositories
 - Infrastructure: Integration tests
@@ -32,42 +34,52 @@ Every layer tested independently:
 ## Layer Details
 
 ### Domain Layer
+
 **Location:** `packages/core/src/domain/`
 
 Contains:
+
 - Entities (User, Session)
 - Value Objects (Email, Password)
 - Repository Interfaces
 
 Rules:
+
 - No framework dependencies
 - Pure TypeScript
 - All business rules here
 
 ### Application Layer
+
 **Location:** `packages/core/src/application/`
 
 Contains:
+
 - Use Cases (RegisterUser, LoginUser)
 - Port Interfaces
 
 Rules:
+
 - Orchestrates domain objects
 - Depends only on domain
 - Defines interfaces for infrastructure
 
 ### Infrastructure Layer
+
 **Location:** `packages/nestjs-adapter/src/infrastructure/`
 
 Contains:
+
 - TypeORM Repositories
 - Security implementations
 - Cache providers
 
 ### Presentation Layer
+
 **Location:** `packages/nestjs-adapter/src/presentation/`
 
 Contains:
+
 - HTTP Controllers
 - Guards & Strategies
 - DTOs

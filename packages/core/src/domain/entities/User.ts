@@ -1,8 +1,8 @@
-import { Entity } from "./base/Entity";
-import { Result } from "../../shared/utils/Result";
-import { Email } from "../value-objects/Email";
-import { Password } from "../value-objects/Password";
-import { UserId } from "../value-objects/UserId";
+import { Entity } from './base/Entity';
+import { Result } from '../../shared/utils/Result';
+import { Email } from '../value-objects/Email';
+import { Password } from '../value-objects/Password';
+import { UserId } from '../value-objects/UserId';
 
 export enum Role {
   USER = 'USER',
@@ -23,9 +23,9 @@ interface UserProps {
 }
 
 export interface CreateUserProps {
-  email: Email
-  password: Password
-  role: Role[]
+  email: Email;
+  password: Password;
+  role: Role[];
 }
 
 export class User extends Entity<UserId> {
@@ -74,16 +74,15 @@ export class User extends Entity<UserId> {
     return new User(props);
   }
 
-  public verifyEmail():Result<void>{
-    if(this._emailVerified)
-      return Result.fail('Email already verified');
+  public verifyEmail(): Result<void> {
+    if (this._emailVerified) return Result.fail('Email already verified');
     this._emailVerified = true;
     this._updatedAt = new Date();
     return Result.ok();
   }
 
   public changePassword(newPassword: Password): Result<void> {
-    if(this.password.equals(newPassword))
+    if (this.password.equals(newPassword))
       return Result.fail('New password must be different from old password');
 
     this.password = newPassword;
@@ -98,22 +97,20 @@ export class User extends Entity<UserId> {
   }
 
   public activate(): Result<void> {
-    if(this._isActive)
-      return Result.fail('User is already active');
+    if (this._isActive) return Result.fail('User is already active');
     this._isActive = true;
     this._updatedAt = new Date();
     return Result.ok();
   }
 
   public deactivate(): Result<void> {
-    if(!this._isActive)
-      return Result.fail('User is already inactive');
+    if (!this._isActive) return Result.fail('User is already inactive');
     this._isActive = false;
     this._updatedAt = new Date();
     return Result.ok();
   }
 
-   public hasRole(role: Role): boolean {
+  public hasRole(role: Role): boolean {
     return this.roles.includes(role);
   }
 
@@ -133,7 +130,7 @@ export class User extends Entity<UserId> {
     if (this.roles.length === 1) {
       return Result.fail('Cannot remove last role');
     }
-    this.roles = this.roles.filter(r => r !== role);
+    this.roles = this.roles.filter((r) => r !== role);
     this._updatedAt = new Date();
     return Result.ok();
   }
@@ -143,7 +140,7 @@ export class User extends Entity<UserId> {
     return this.email;
   }
 
-   public getPassword(): Password {
+  public getPassword(): Password {
     return this.password;
   }
 
@@ -170,8 +167,4 @@ export class User extends Entity<UserId> {
   public getUpdatedAt(): Date {
     return this._updatedAt;
   }
-
-
-
 }
-

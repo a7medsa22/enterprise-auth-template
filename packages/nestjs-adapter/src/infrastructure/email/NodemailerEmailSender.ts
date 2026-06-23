@@ -12,11 +12,17 @@ export class NodemailerEmailSender implements IEmailSender {
 
   constructor(private readonly configService: ConfigService) {
     const host = this.configService.get<string>('email.smtp.host') || process.env.SMTP_HOST;
-    const port = this.configService.get<number>('email.smtp.port') || parseInt(process.env.SMTP_PORT || '587', 10);
+    const port =
+      this.configService.get<number>('email.smtp.port') ||
+      parseInt(process.env.SMTP_PORT || '587', 10);
     const user = this.configService.get<string>('email.smtp.user') || process.env.SMTP_USER;
     const pass = this.configService.get<string>('email.smtp.pass') || process.env.SMTP_PASS;
-    const secure = this.configService.get<boolean>('email.smtp.secure') || process.env.SMTP_SECURE === 'true';
-    this.from = this.configService.get<string>('email.smtp.from') || process.env.SMTP_FROM || 'Auth Template <noreply@example.com>';
+    const secure =
+      this.configService.get<boolean>('email.smtp.secure') || process.env.SMTP_SECURE === 'true';
+    this.from =
+      this.configService.get<string>('email.smtp.from') ||
+      process.env.SMTP_FROM ||
+      'Auth Template <noreply@example.com>';
 
     if (!host || !user || !pass) {
       this.logger.warn(

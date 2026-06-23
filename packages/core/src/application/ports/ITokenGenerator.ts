@@ -1,15 +1,15 @@
-import { UserId } from "../../domain/value-objects/UserId";
-import { Result } from "../../shared/utils/Result";
+import { UserId } from '../../domain/value-objects/UserId';
+import { Result } from '../../shared/utils/Result';
 export interface TokenPayload {
-    userId:string;
-    email:string;
-    roles:string[];
+  userId: string;
+  email: string;
+  roles: string[];
 }
-export interface ITokenGenerator{
-    generateAccessToken(userId:UserId,payload:TokenPayload):Promise<Result<string>>;
-    generateRefreshToken(userId:UserId):Promise<Result<string>>;
-    verifyAccessToken(token:string):Promise<Result<TokenPayload>>;
-    verifyRefreshToken(token:string):Promise<Result<UserId>>;
-    getAccessTokenExpiration():number;
-    getRefreshTokenExpiration():number;
-} 
+export interface ITokenGenerator {
+  generateAccessToken(userId: UserId, payload: TokenPayload): Promise<Result<string>>;
+  generateRefreshToken(userId: UserId): Promise<Result<string>>;
+  verifyAccessToken(token: string): Promise<Result<TokenPayload>>;
+  verifyRefreshToken(token: string): Promise<Result<UserId>>;
+  getAccessTokenExpiration(): number;
+  getRefreshTokenExpiration(): number;
+}

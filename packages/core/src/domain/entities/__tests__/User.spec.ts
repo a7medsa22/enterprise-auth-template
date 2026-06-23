@@ -7,15 +7,15 @@ describe('User Entity', () => {
   const validPassword = () => Password.create({ value: 'hashed-pass', hashed: true }).getValue();
 
   const createUser = () =>
-  User.create({
-    email: validEmail(),
-    password: validPassword(),
-    role: [Role.USER],
-  })
-  
+    User.create({
+      email: validEmail(),
+      password: validPassword(),
+      role: [Role.USER],
+    });
+
   describe('create', () => {
     it('should create a user successfully with valid data', () => {
-      const result = createUser()
+      const result = createUser();
       expect(result.isSuccess).toBe(true);
 
       const user = result.getValue();
@@ -64,7 +64,7 @@ describe('User Entity', () => {
     });
     it('should fail if new password is same as current', () => {
       const user = createUser().getValue();
-      const password = validPassword()
+      const password = validPassword();
       const result = user.changePassword(password);
 
       expect(result.isFailure).toBe(true);

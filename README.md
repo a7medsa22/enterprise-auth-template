@@ -10,12 +10,14 @@
 ## ✨ Why This Template?
 
 Traditional auth systems couple business logic to frameworks, making them:
+
 - ❌ Hard to test
 - ❌ Impossible to reuse
 - ❌ Difficult to maintain
 - ❌ Framework-locked
 
 This template solves all that:
+
 - ✅ **Framework Agnostic** - Core works with ANY framework
 - ✅ **Production Ready** - Used in real-world applications
 - ✅ **Fully Tested** - 80%+ test coverage
@@ -70,6 +72,7 @@ auth-template/
 ## 🌟 Key Features
 
 ### Security First
+
 - ✅ JWT with token rotation
 - ✅ Bcrypt/Argon2 password hashing
 - ✅ Rate limiting & account lockout
@@ -78,6 +81,7 @@ auth-template/
 - ✅ CORS & Helmet protection
 
 ### Clean Architecture
+
 - ✅ Zero framework dependencies in core
 - ✅ Clear layer separation
 - ✅ Easy to test every layer
@@ -85,6 +89,7 @@ auth-template/
 - ✅ Single responsibility principle
 
 ### Developer Experience
+
 - ✅ TypeScript with strict mode
 - ✅ Result pattern (no exceptions)
 - ✅ Comprehensive documentation
@@ -93,6 +98,7 @@ auth-template/
 - ✅ ESLint + Prettier configured
 
 ### Production Ready
+
 - ✅ Docker multi-stage builds
 - ✅ CI/CD with GitHub Actions
 - ✅ Health checks & monitoring
@@ -109,6 +115,7 @@ auth-template/
 - **[API Reference](docs/api/openapi.yaml)** - OpenAPI 3.0 spec
 
 ### Architecture Decision Records
+
 - [ADR 001: Clean Architecture](docs/architecture/decisions/001-clean-architecture.md)
 - [ADR 002: Repository Pattern](docs/architecture/decisions/002-repository-pattern.md)
 - [ADR 003: Event-Driven](docs/architecture/decisions/003-event-driven.md)
@@ -217,12 +224,12 @@ docker build -t auth-template:latest -f docker/Dockerfile .
 
 ## 📊 Performance
 
-| Operation      | Time  | RPS  |
-|----------------|-------|------|
-| Register       | 120ms | 833  |
-| Login          | 110ms | 909  |
-| Refresh        | 25ms  | 4000 |
-| Protected Route| 15ms  | 6666 |
+| Operation       | Time  | RPS  |
+| --------------- | ----- | ---- |
+| Register        | 120ms | 833  |
+| Login           | 110ms | 909  |
+| Refresh         | 25ms  | 4000 |
+| Protected Route | 15ms  | 6666 |
 
 ## 🛠️ Tech Stack
 
@@ -243,7 +250,6 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
 
 ## 👥 Authors
 

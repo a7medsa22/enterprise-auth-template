@@ -1,10 +1,5 @@
 import { IRateLimiter } from '../../ports/IRateLimiter';
-import {
-  ILogger,
-  IPasswordHasher,
-  ITokenGenerator,
-  TokenPayload,
-} from '../../ports';
+import { ILogger, IPasswordHasher, ITokenGenerator, TokenPayload } from '../../ports';
 import { Email } from '../../../domain/value-objects/Email';
 import { Result } from '../../../shared/utils/Result';
 import { IUserRepository } from '../../../domain/repositories/IUserRepository';
@@ -33,7 +28,7 @@ export class LoginUser {
     private readonly tokenGenerator: ITokenGenerator,
     private readonly rateLimiter: IRateLimiter,
     private readonly logger: ILogger,
-    private readonly eventBus:IEventBus,
+    private readonly eventBus: IEventBus,
   ) {}
   async execute(dto: LoginUserDTO): Promise<Result<LoginUserResult>> {
     // 1:> Rate limiting
@@ -105,41 +100,28 @@ export class LoginUser {
       roles: user.getRoles(),
     };
 
-    const accessTokenOrError = await this.tokenGenerator.generateAccessToken(
-      user.id,
-      tokenPayload,
-    );
+    const accessTokenOrError = await this.tokenGenerator.generateAccessToken(user.id, tokenPayload);
     if (accessTokenOrError.isFailure) {
-      this.logger.error(
-        'Failed to generate access token',
-        new Error(accessTokenOrError.error),
-      );
+      this.logger.error('Failed to generate access token', new Error(accessTokenOrError.error));
       return Result.fail('Unable to complete login');
     }
 
-    const refreshTokenOrError = await this.tokenGenerator.generateRefreshToken(
-      user.id,
-    );
+    const refreshTokenOrError = await this.tokenGenerator.generateRefreshToken(user.id);
     if (refreshTokenOrError.isFailure) {
-      this.logger.error(
-        'Failed to generate refresh token',
-        new Error(refreshTokenOrError.error),
-      );
+      this.logger.error('Failed to generate refresh token', new Error(refreshTokenOrError.error));
       return Result.fail('Unable to complete login');
     }
-
 
     //publish Event
     const ipAddressOrError = IPAddress.create(dto.ipAddress);
-    if(ipAddressOrError.isSuccess){
-      await this.eventBus.publish(new UserLoginEvent(user.id,ipAddressOrError.getValue()))
+    if (ipAddressOrError.isSuccess) {
+      await this.eventBus.publish(new UserLoginEvent(user.id, ipAddressOrError.getValue()));
     }
 
-
     // log succrss
-    this.logger.info('User logged in successfully',{
-      userId:user.id.getValue(),
-      ipAddress:dto.ipAddress
+    this.logger.info('User logged in successfully', {
+      userId: user.id.getValue(),
+      ipAddress: dto.ipAddress,
     });
 
     return Result.ok({

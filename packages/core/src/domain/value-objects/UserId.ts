@@ -19,7 +19,7 @@ export class UserId {
     return this.value === userId.value;
   }
 
-  public toString():string{
+  public toString(): string {
     return this.value;
   }
 }

@@ -57,9 +57,12 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiCreatedResponse({ description: 'The user has been successfully registered.', type: AuthResponse })
+  @ApiCreatedResponse({
+    description: 'The user has been successfully registered.',
+    type: AuthResponse,
+  })
   @ApiBadRequestResponse({ description: 'Invalid input data or user already exists.' })
-  async register(@Body() dto: RegisterRequest, @Req() req: Request): Promise<AuthResponse> {
+  async register(@Body() dto: RegisterRequest): Promise<AuthResponse> {
     const result = await this.registerUser.execute({
       email: dto.email,
       password: dto.password,
@@ -138,7 +141,10 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access and refresh tokens' })
-  @ApiOkResponse({ description: 'The tokens have been successfully refreshed.', type: TokenResponse })
+  @ApiOkResponse({
+    description: 'The tokens have been successfully refreshed.',
+    type: TokenResponse,
+  })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token.' })
   async refresh(@Body() dto: RefreshTokenRequest): Promise<TokenResponse> {
     const result = await this.refreshToken.execute({
@@ -195,7 +201,9 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Change the password of the current user' })
   @ApiOkResponse({ description: 'Password changed successfully.' })
-  @ApiBadRequestResponse({ description: 'Invalid current password or new password validation error.' })
+  @ApiBadRequestResponse({
+    description: 'Invalid current password or new password validation error.',
+  })
   async changePasswordHandler(
     @CurrentUser('userId') userId: string,
     @Body() dto: ChangePasswordRequest,

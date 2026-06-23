@@ -38,7 +38,7 @@ export class JwtTokenGenerator implements ITokenGenerator {
         algorithm: 'HS256',
       });
       return Result.ok(token);
-    } catch (error) {
+    } catch {
       return Result.fail(`Failed to generate access token`);
     }
   }
@@ -77,7 +77,7 @@ export class JwtTokenGenerator implements ITokenGenerator {
       }
 
       return Result.ok(token);
-    } catch (error) {
+    } catch {
       return Result.fail(`Failed to generate refresh token`);
     }
   }
@@ -89,7 +89,7 @@ export class JwtTokenGenerator implements ITokenGenerator {
         algorithms: ['HS256'],
       });
       return Result.ok(payload);
-    } catch (error) {
+    } catch {
       return Result.fail(`Invalid or expired access token`);
     }
   }
@@ -108,7 +108,7 @@ export class JwtTokenGenerator implements ITokenGenerator {
       }
 
       return Result.ok(UserId.create(payload.sub));
-    } catch (error) {
+    } catch {
       return Result.fail(`Invalid or expired refresh token`);
     }
   }

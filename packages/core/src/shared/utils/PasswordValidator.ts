@@ -1,5 +1,4 @@
-import { Result } from "./Result";
-
+import { Result } from './Result';
 
 export class PasswordValidator {
   /**
@@ -11,33 +10,37 @@ export class PasswordValidator {
    */
   static validate(password: string): Result<void> {
     if (password.length < 8) {
-      return Result.fail("Password must be at least 8 characters long");
+      return Result.fail('Password must be at least 8 characters long');
     }
 
     if (!/[A-Z]/.test(password)) {
-      return Result.fail("Password must contain at least one uppercase letter");
+      return Result.fail('Password must contain at least one uppercase letter');
     }
 
     if (!/[a-z]/.test(password)) {
-      return Result.fail("Password must contain at least one lowercase letter");
+      return Result.fail('Password must contain at least one lowercase letter');
     }
 
     if (!/[0-9]/.test(password)) {
-      return Result.fail("Password must contain at least one numeric digit");
+      return Result.fail('Password must contain at least one numeric digit');
     }
 
     if (!/[@$!%*?&]/.test(password)) {
-      return Result.fail("Password must contain at least one special character");
+      return Result.fail('Password must contain at least one special character');
     }
 
     if (/\s/.test(password)) {
-      return Result.fail("Password must not contain whitespace characters");
+      return Result.fail('Password must not contain whitespace characters');
     }
     if (/(.)\1\1/.test(password)) {
-      return Result.fail("Password must not contain sequences of three or more repeated characters");
+      return Result.fail(
+        'Password must not contain sequences of three or more repeated characters',
+      );
     }
     if (/(012|123|234|345|456|567|678|789|890)/.test(password)) {
-        return Result.fail("Password must not contain sequences of three or more consecutive numbers");
+      return Result.fail(
+        'Password must not contain sequences of three or more consecutive numbers',
+      );
     }
 
     // additional rules could be added here (e.g. blacklist, entropy check,

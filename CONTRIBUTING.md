@@ -7,12 +7,14 @@ Thank you for considering contributing to this project!
 ## How to Contribute
 
 ### 1. Fork & Clone
+
 ```bash
 git clone https://github.com/your-username/auth-template.git
 cd auth-template
 ```
 
 ### 2. Create Branch
+
 ```bash
 git checkout -b feature/my-feature
 ```
@@ -24,6 +26,7 @@ git checkout -b feature/my-feature
 - Update documentation
 
 ### 4. Test
+
 ```bash
 pnpm test
 pnpm test:e2e
@@ -31,11 +34,13 @@ pnpm lint
 ```
 
 ### 5. Commit
+
 ```bash
 git commit -m "feat: add amazing feature"
 ```
 
 Use conventional commits:
+
 - `feat:` New feature
 - `fix:` Bug fix
 - `docs:` Documentation
@@ -43,6 +48,7 @@ Use conventional commits:
 - `refactor:` Code refactoring
 
 ### 6. Push & PR
+
 ```bash
 git push origin feature/my-feature
 ```

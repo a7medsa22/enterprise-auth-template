@@ -1,6 +1,6 @@
-import { CacheOptions, ICacheProvider } from "@auth-template/core/application";
-import { Result } from "@auth-template/core";
-import { Injectable } from "@nestjs/common/decorators/core/injectable.decorator";
+import { CacheOptions, ICacheProvider } from '@auth-template/core/application';
+import { Result } from '@auth-template/core';
+import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 
 interface CacheEntry<T> {
   value: T;
@@ -14,7 +14,7 @@ export class MemoryCache implements ICacheProvider {
   async get<T>(key: string): Promise<Result<T | null>> {
     try {
       const entry = this.cache.get(key);
-      
+
       if (!entry) {
         return Result.ok(null);
       }

@@ -51,7 +51,10 @@ async function bootstrap() {
     .setTitle('Enterprise Auth API')
     .setDescription('The API documentation for the Enterprise Auth Template')
     .setVersion('1.0')
-    .addTag('Authentication', 'Endpoints for user registration, login, token refresh, and password management')
+    .addTag(
+      'Authentication',
+      'Endpoints for user registration, login, token refresh, and password management',
+    )
     .addBearerAuth(
       {
         type: 'http',
@@ -74,4 +77,4 @@ async function bootstrap() {
   logger.log(`📚 API Documentation: http://localhost:${port}/api`);
   logger.log(`🏥 Health Check: http://localhost:${port}/health`);
 }
-bootstrap();
+void bootstrap();

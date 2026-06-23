@@ -1,4 +1,4 @@
-import { Result } from "../../shared/utils/Result";
+import { Result } from '../../shared/utils/Result';
 
 export class Email {
   private readonly value: string;

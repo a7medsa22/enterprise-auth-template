@@ -31,9 +31,7 @@ export class RefreshTokenUseCase {
     const token = tokenOrError.getValue();
 
     // 2. Verify token with generator
-    const userIdOrError = await this.tokenGenerator.verifyRefreshToken(
-      dto.refreshToken,
-    );
+    const userIdOrError = await this.tokenGenerator.verifyRefreshToken(dto.refreshToken);
     if (userIdOrError.isFailure) {
       this.logger.warn('Invalid refresh token provided');
       return Result.fail('Invalid or expired token');
@@ -61,11 +59,9 @@ export class RefreshTokenUseCase {
     // 5. Get user
     const userOrError = await this.userRepository.findById(userId);
     if (userOrError.isFailure) {
-      this.logger.error(
-        'User not found for valid token',
-        new Error(userOrError.error),
-        { userId: userId.getValue() },
-      );
+      this.logger.error('User not found for valid token', new Error(userOrError.error), {
+        userId: userId.getValue(),
+      });
       return Result.fail('User not found');
     }
     const user = userOrError.getValue();
@@ -100,8 +96,7 @@ export class RefreshTokenUseCase {
       return Result.fail('Unable to refresh token');
     }
 
-    const newRefreshTokenOrError =
-      await this.tokenGenerator.generateRefreshToken(user.id);
+    const newRefreshTokenOrError = await this.tokenGenerator.generateRefreshToken(user.id);
     if (newRefreshTokenOrError.isFailure) {
       this.logger.error('Failed to generate new refresh token');
       return Result.fail('Unable to refresh token');

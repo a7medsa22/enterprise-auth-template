@@ -3,6 +3,7 @@
 ## Adding a New Use Case
 
 ### Step 1: Create the Use Case
+
 ```typescript
 // packages/core/src/application/use-cases/auth/ResetPassword.ts
 
@@ -26,9 +27,7 @@ export class ResetPassword {
     }
 
     // 2. Get user
-    const userOrError = await this.userRepository.findByEmail(
-      emailOrError.getValue()
-    );
+    const userOrError = await this.userRepository.findByEmail(emailOrError.getValue());
     if (userOrError.isFailure) {
       return Result.fail('User not found');
     }
@@ -60,11 +59,12 @@ export class ResetPassword {
 ```
 
 ### Step 2: Add to Module
+
 ```typescript
 providers: [
   {
     provide: ResetPassword,
-    useFactory: (userRepo, passwordHasher) => 
+    useFactory: (userRepo, passwordHasher) =>
       new ResetPassword(userRepo, passwordHasher),
     inject: ['IUserRepository', 'IPasswordHasher'],
   },
@@ -72,6 +72,7 @@ providers: [
 ```
 
 ### Step 3: Create Controller Endpoint
+
 ```typescript
 @Public()
 @Post('reset-password')
@@ -87,6 +88,7 @@ async resetPassword(@Body() dto: ResetPasswordRequest) {
 ## Adding a New Repository
 
 ### Step 1: Define Interface
+
 ```typescript
 // packages/core/src/domain/repositories/INotificationRepository.ts
 export interface INotificationRepository {
@@ -96,6 +98,7 @@ export interface INotificationRepository {
 ```
 
 ### Step 2: Implement
+
 ```typescript
 @Injectable()
 export class TypeOrmNotificationRepository implements INotificationRepository {
@@ -112,6 +115,7 @@ export class TypeOrmNotificationRepository implements INotificationRepository {
 ```
 
 ### Step 3: Register
+
 ```typescript
 providers: [
   {
@@ -122,6 +126,7 @@ providers: [
 ```
 
 ## Adding a New Framework Adapter
+
 ```text
 packages/express-adapter/
 ├── src/
@@ -147,7 +152,7 @@ import { RegisterUser } from '@auth-template/core';
 
 export function createAuthRouter(dependencies) {
   const router = Router();
-  
+
   router.post('/register', async (req, res) => {
     const registerUser = new RegisterUser(
       dependencies.userRepository,
@@ -171,10 +176,10 @@ export function createAuthRouter(dependencies) {
 }
 ```
 
-
 ## Environment Configuration
 
 ### Development
+
 ```env
 NODE_ENV=development
 JWT_ACCESS_EXPIRATION=15m
@@ -182,6 +187,7 @@ BCRYPT_ROUNDS=10
 ```
 
 ### Production
+
 ```env
 NODE_ENV=production
 JWT_ACCESS_EXPIRATION=5m

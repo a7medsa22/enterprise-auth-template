@@ -10,7 +10,8 @@ export class RegisterRequest {
   email!: string;
 
   @ApiProperty({
-    description: 'Password of the user (must contain uppercase, lowercase, number, and special character)',
+    description:
+      'Password of the user (must contain uppercase, lowercase, number, and special character)',
     minLength: 8,
     maxLength: 128,
     example: 'SecurePass@123',

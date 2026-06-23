@@ -111,6 +111,7 @@ Contains all business logic with **zero framework dependencies**:
 - **Domain Layer**: Entities, Value Objects, Repository Interfaces
 - **Application Layer**: Use Cases, Application Services, Ports
 - **Shared Layer**: Events, Errors, Utilities
+
 ```typescript
 // Example: Using a use case
 import { RegisterUser } from '@auth-template/core';
@@ -121,7 +122,7 @@ const registerUser = new RegisterUser(
   tokenGenerator,
   emailSender,
   eventBus,
-  logger
+  logger,
 );
 
 const result = await registerUser.execute({
@@ -139,6 +140,7 @@ if (result.isSuccess) {
 **Location:** `packages/nestjs-adapter/`
 
 Provides NestJS-specific implementations:
+
 ```typescript
 import { AuthModule } from '@auth-template/nestjs-adapter';
 

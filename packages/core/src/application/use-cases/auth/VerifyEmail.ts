@@ -23,9 +23,7 @@ export class VerifyEmail {
   ) {}
 
   async execute(dto: VerifyEmailDTO): Promise<Result<VerifyEmailResult>> {
-    const payloadOrError = await this.tokenGenerator.verifyAccessToken(
-      dto.verificationToken,
-    );
+    const payloadOrError = await this.tokenGenerator.verifyAccessToken(dto.verificationToken);
     if (payloadOrError.isFailure) {
       return Result.fail('Invalid or expired verification token');
     }
