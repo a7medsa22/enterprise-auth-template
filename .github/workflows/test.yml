@@ -37,15 +37,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@v4
 
       - name: Setup PNPM
-        uses: pnpm/action-setup@fe6cd3402a4151622294165bc104aaed75860b3e
+        uses: pnpm/action-setup@v3
         with:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@39370e3973fc2f0429ac512a68f3775a63547315
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
@@ -92,7 +92,7 @@ jobs:
           JWT_REFRESH_SECRET: test-super-secret-refresh-key-for-e2e-testing
 
       - name: Upload coverage
-        uses: codecov/codecov-action@015f24e68187333175157786140802290d716858 # الـ SHA الصحيح والآمن لـ v4 🎯
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage/lcov.info
           flags: unittests
