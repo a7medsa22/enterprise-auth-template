@@ -77,6 +77,8 @@ jobs:
           DB_NAME: auth_db_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
+          JWT_ACCESS_SECRET: test-super-secret-key-for-e2e-testing
+          JWT_REFRESH_SECRET: test-super-secret-refresh-key-for-e2e-testing
 
       - name: Run e2e tests
         run: pnpm run test:e2e
@@ -88,9 +90,11 @@ jobs:
           DB_NAME: auth_db_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
+          JWT_ACCESS_SECRET: test-super-secret-key-for-e2e-testing
+          JWT_REFRESH_SECRET: test-super-secret-refresh-key-for-e2e-testing
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@eaaf4bed763e00d95599b519027ef1816a3562b6
         with:
           files: ./coverage/lcov.info
           flags: unittests

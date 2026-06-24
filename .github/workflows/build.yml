@@ -47,4 +47,4 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/var/www/auth-backend
-            pm2 restart auth-backend-app || pm2 start dist/main.js --name "auth-backend-app"
+            npx pm2 restart auth-backend-app || npx pm2 start dist/main.js --name "auth-backend-app"
