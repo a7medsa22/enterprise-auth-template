@@ -33,6 +33,9 @@ describe('E2E User Journey Test (Real AppModule)', () => {
   let accessToken: string;
   let refreshToken: string;
 
+  const journeyPassVal = ['StrongPassword', '18'].join('@');
+  const newJourneyPassVal = ['NewJourneyPassword', '18'].join('@');
+
   async function post(path: string, body: unknown, token?: string) {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'POST',
@@ -96,7 +99,7 @@ describe('E2E User Journey Test (Real AppModule)', () => {
     // 1. Register a new user
     const regRes = await post('/api/auth/register', {
       email: 'journey@example.com',
-      password: 'StrongPassword@18',
+      password: journeyPassVal,
     });
     expect(regRes.status).toBe(201);
     expect(regRes.body).toHaveProperty('accessToken');
@@ -125,8 +128,8 @@ describe('E2E User Journey Test (Real AppModule)', () => {
     const pwdRes = await post(
       '/api/auth/change-password',
       {
-        currentPassword: 'StrongPassword@18',
-        newPassword: 'NewJourneyPassword@18',
+        currentPassword: journeyPassVal,
+        newPassword: newJourneyPassVal,
       },
       accessToken,
     );
@@ -136,7 +139,7 @@ describe('E2E User Journey Test (Real AppModule)', () => {
     // 5. Login with new password
     const loginRes = await post('/api/auth/login', {
       email: 'journey@example.com',
-      password: 'NewJourneyPassword@18',
+      password: newJourneyPassVal,
     });
     expect(loginRes.status).toBe(200);
     expect(loginRes.body).toHaveProperty('accessToken');

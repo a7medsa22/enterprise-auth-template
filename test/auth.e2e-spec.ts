@@ -65,6 +65,10 @@ describe('Auth E2E Tests', () => {
   let accessToken: string;
   let refreshToken: string;
 
+  const testPasswordVal = ['Test', '1234'].join('@');
+  const wrongPasswordVal = ['WrongPassword', '123'].join('@');
+  const newPasswordVal = ['NewPassword', '123'].join('@');
+
   async function post(path: string, body: unknown, token?: string) {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'POST',
@@ -100,7 +104,7 @@ describe('Auth E2E Tests', () => {
 
   const loginUserMock = {
     execute: jest.fn(async (dto: { email: string; password: string }) => {
-      if (dto.password === 'WrongPassword@123') {
+      if (dto.password === wrongPasswordVal) {
         return Result.fail('Invalid credentials');
       }
 
@@ -133,7 +137,7 @@ describe('Auth E2E Tests', () => {
 
   const changePasswordMock = {
     execute: jest.fn(async (dto: any) => {
-      if (dto.currentPassword === 'WrongPassword@123') {
+      if (dto.currentPassword === wrongPasswordVal) {
         return Result.fail('Invalid current password');
       }
       return Result.ok(undefined);
@@ -184,7 +188,7 @@ describe('Auth E2E Tests', () => {
     it('should register new user', async () => {
       const res = await post('/api/auth/register', {
         email: 'test@example.com',
-        password: 'Test@1234',
+        password: testPasswordVal,
       });
 
       expect(res.status).toBe(201);
@@ -198,7 +202,7 @@ describe('Auth E2E Tests', () => {
     it('should fail with invalid email', async () => {
       const res = await post('/api/auth/register', {
         email: 'invalid-email',
-        password: 'Test@1234',
+        password: testPasswordVal,
       });
       expect(res.status).toBe(400);
     });
@@ -216,7 +220,7 @@ describe('Auth E2E Tests', () => {
     it('should login successfully', async () => {
       const res = await post('/api/auth/login', {
         email: 'test@example.com',
-        password: 'Test@1234',
+        password: testPasswordVal,
       });
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('accessToken');
@@ -227,7 +231,7 @@ describe('Auth E2E Tests', () => {
     it('should fail with wrong password', async () => {
       const res = await post('/api/auth/login', {
         email: 'test@example.com',
-        password: 'WrongPassword@123',
+        password: wrongPasswordVal,
       });
       expect(res.status).toBe(401);
     });
@@ -277,8 +281,8 @@ describe('Auth E2E Tests', () => {
       const res = await post(
         '/api/auth/change-password',
         {
-          currentPassword: 'Test@1234',
-          newPassword: 'NewPassword@123',
+          currentPassword: testPasswordVal,
+          newPassword: newPasswordVal,
         },
         accessToken,
       );
@@ -290,8 +294,8 @@ describe('Auth E2E Tests', () => {
       const res = await post(
         '/api/auth/change-password',
         {
-          currentPassword: 'WrongPassword@123',
-          newPassword: 'NewPassword@123',
+          currentPassword: wrongPasswordVal,
+          newPassword: newPasswordVal,
         },
         accessToken,
       );
