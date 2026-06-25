@@ -41,7 +41,7 @@ jobs:
           target: '/home/ubuntu/var/www/auth-backend'
 
       - name: Restart PM2 on EC2
-        uses: appleboy/ssh-action@068c0c7a4e59a5ae12fb7cb454b05735d830c82b # master
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -49,31 +49,18 @@ jobs:
           script: |
             cd /home/ubuntu/var/www/auth-backend
 
-            # 1. Load environment profiles
-            [ -f ~/.profile ] && . ~/.profile
-            [ -f ~/.bashrc ] && . ~/.bashrc
-
-            # 2. Load NVM
-            export NVM_DIR="$HOME/.nvm"
-            if [ -s "$NVM_DIR/nvm.sh" ]; then
-              \. "$NVM_DIR/nvm.sh"
-              nvm use default || nvm use node || true
+            if ! command -v node &> /dev/null; then
+              echo "Node not found. Installing Node.js..."
+              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+              sudo apt-get install -y nodejs
             fi
 
-            export PATH="$PATH:$HOME/.npm-global/bin"
+            sudo npm install -g pnpm pm2
 
-            if ! command -v pm2 &> /dev/null; then
-              echo "PM2 not found. Installing global prefix..."
-              npm install pm2 -g --prefix ~/.npm-global
-              export PATH="$HOME/.npm-global/bin:$PATH"
-            fi
-
-            echo "Installing production dependencies..."
-            npx pnpm install --prod --frozen-lockfile
+            pnpm install --prod --frozen-lockfile
 
             if pm2 describe auth-backend-app &> /dev/null; then
-              echo "Application exists, restarting..."
               pm2 restart auth-backend-app
             else
-              echo "Application does not exist, starting for the first time..."
-              pm2 start apps/demo/dist/main.js --name "auth-backend-app"            fi
+              pm2 start apps/demo/dist/main.js --name "auth-backend-app"
+            fi
