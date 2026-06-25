@@ -37,7 +37,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'dist/,node_modules/,package.json,pnpm-lock.yaml'
+          source: 'package.json,pnpm-lock.yaml,pnpm-workspace.yaml,dist/,apps/demo/package.json,apps/demo/dist/,packages/core/package.json,packages/core/dist/,packages/nestjs-adapter/package.json,packages/nestjs-adapter/dist/'
           target: '/home/ubuntu/var/www/auth-backend'
 
       - name: Restart PM2 on EC2
@@ -76,5 +76,4 @@ jobs:
               pm2 restart auth-backend-app
             else
               echo "Application does not exist, starting for the first time..."
-              pm2 start dist/main.js --name "auth-backend-app"
-            fi
+              pm2 start apps/demo/dist/main.js --name "auth-backend-app"            fi
