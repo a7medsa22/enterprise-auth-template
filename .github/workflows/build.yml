@@ -49,50 +49,32 @@ jobs:
           script: |
             cd /home/ubuntu/var/www/auth-backend
 
-            # 1. Load environment profiles to restore interactive PATH variables
+            # 1. Load environment profiles
             [ -f ~/.profile ] && . ~/.profile
             [ -f ~/.bashrc ] && . ~/.bashrc
 
-            # 2. Load NVM if present and select default version
+            # 2. Load NVM
             export NVM_DIR="$HOME/.nvm"
             if [ -s "$NVM_DIR/nvm.sh" ]; then
               \. "$NVM_DIR/nvm.sh"
               nvm use default || nvm use node || true
             fi
 
-            # 3. Add custom npm global bin path to PATH
             export PATH="$PATH:$HOME/.npm-global/bin"
 
-            # 4. Manually search and add NVM node version bin folder to PATH if still not found
-            if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
-              NVM_NODE_BIN=$(find "$HOME/.nvm/versions/node" -maxdepth 3 -type d -name "bin" 2>/dev/null | head -n 1)
-              if [ -n "$NVM_NODE_BIN" ]; then
-                export PATH="$NVM_NODE_BIN:$PATH"
-              fi
-            fi
-
-            # 5. If PM2 still not found, search NVM versions folder for it
             if ! command -v pm2 &> /dev/null; then
-              PM2_PATH=$(find "$HOME/.nvm/versions/node" -maxdepth 4 -type f -name "pm2" 2>/dev/null | head -n 1)
-              if [ -n "$PM2_PATH" ]; then
-                export PATH="$(dirname "$PM2_PATH"):$PATH"
-              fi
-            fi
-
-            # 6. Safety check: Ensure node and npm are available before installing dependencies
-            if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
-              echo "Error: node or npm not found in PATH ($PATH). Ensure Node.js is installed on the EC2 host." >&2
-              exit 1
-            fi
-
-            # 7. Install PM2 in user-space if still not found
-            if ! command -v pm2 &> /dev/null; then
-              echo "PM2 not found. Installing..."
+              echo "PM2 not found. Installing global prefix..."
               npm install pm2 -g --prefix ~/.npm-global
+              export PATH="$HOME/.npm-global/bin:$PATH"
             fi
 
-            # 8. Install production dependencies on server
-            npm install --production
+            echo "Installing production dependencies..."
+            npx pnpm install --prod --frozen-lockfile
 
-            # 9. Restart or start application with PM2
-            pm2 restart auth-backend-app || pm2 start dist/main.js --name "auth-backend-app"
+            if pm2 describe auth-backend-app &> /dev/null; then
+              echo "Application exists, restarting..."
+              pm2 restart auth-backend-app
+            else
+              echo "Application does not exist, starting for the first time..."
+              pm2 start dist/main.js --name "auth-backend-app"
+            fi
