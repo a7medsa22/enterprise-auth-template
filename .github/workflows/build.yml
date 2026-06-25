@@ -9,15 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup PNPM
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v3.0.0
         with:
           version: 9
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
           cache: 'pnpm'
@@ -32,7 +32,7 @@ jobs:
         run: pnpm prune --production
 
       - name: Copy files to EC2 via SCP
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@5bb815ae7f76baf13e1646dc59b8239beeb6ed57 # master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -41,7 +41,7 @@ jobs:
           target: '/home/ubuntu/var/www/auth-backend'
 
       - name: Restart PM2 on EC2
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@068c0c7a4e59a5ae12fb7cb454b05735d830c82b # master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
