@@ -41,7 +41,7 @@ jobs:
           target: '/home/ubuntu/var/www/auth-backend'
 
       - name: Restart PM2 on EC2
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@7eaf76671a0d7eec5d98ee897acda4f968735a17 # v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -58,6 +58,21 @@ jobs:
             sudo npm install -g pnpm pm2
 
             pnpm install --prod --frozen-lockfile
+
+            echo "=== Workspace Diagnostics ==="
+            echo "Current Dir: $(pwd)"
+            echo "Root files:"
+            ls -la
+            echo "Apps demo files:"
+            ls -la apps/demo/ || true
+            echo "Packages core files:"
+            ls -la packages/core/ || true
+            echo "Packages adapter files:"
+            ls -la packages/nestjs-adapter/ || true
+            echo "Root node_modules/@auth-template:"
+            ls -la node_modules/@auth-template/ || true
+            echo "Demo node_modules/@auth-template:"
+            ls -la apps/demo/node_modules/@auth-template/ || true
 
             if pm2 describe auth-backend-app &> /dev/null; then
               pm2 restart auth-backend-app
