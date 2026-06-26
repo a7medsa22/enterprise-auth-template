@@ -28,8 +28,8 @@ jobs:
       - name: Build Application
         run: pnpm run build
 
-      - name: Prune development dependencies
-        run: pnpm prune --production
+      - name: Deploy pruned packages
+        run: pnpm --filter=demo-api --prod deploy deploy-dist
 
       - name: Copy files to EC2 via SCP
         uses: appleboy/scp-action@5bb815ae7f76baf13e1646dc59b8239beeb6ed57 # master
@@ -37,8 +37,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'package.json,pnpm-lock.yaml,pnpm-workspace.yaml,dist/,apps/demo/package.json,apps/demo/dist/,packages/core/package.json,packages/core/dist/,packages/nestjs-adapter/package.json,packages/nestjs-adapter/dist/'
+          source: 'deploy-dist/**'
           target: '/home/ubuntu/var/www/auth-backend'
+          strip_components: 1
 
       - name: Restart PM2 on EC2
         uses: appleboy/ssh-action@7eaf76671a0d7eec5d98ee897acda4f968735a17 # v1.2.0
@@ -49,33 +50,31 @@ jobs:
           script: |
             cd /home/ubuntu/var/www/auth-backend
 
-            if ! command -v node &> /dev/null; then
-              echo "Node not found. Installing Node.js..."
-              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-              sudo apt-get install -y nodejs
+            # Load environment profiles to restore interactive PATH variables
+            [ -f ~/.profile ] && . ~/.profile
+            [ -f ~/.bashrc ] && . ~/.bashrc
+
+            # Load NVM if present and select default version
+            export NVM_DIR="$HOME/.nvm"
+            if [ -s "$NVM_DIR/nvm.sh" ]; then
+              \. "$NVM_DIR/nvm.sh"
+              nvm use default || nvm use node || true
             fi
 
-            sudo npm install -g pnpm pm2
+            # Add custom npm global bin path to PATH
+            export PATH="$PATH:$HOME/.npm-global/bin"
 
-            pnpm install --prod --frozen-lockfile
+            # Install PM2 in user-space if still not found
+            if ! command -v pm2 &> /dev/null; then
+              echo "PM2 not found. Installing..."
+              npm install pm2 -g --prefix ~/.npm-global
+            fi
 
-            echo "=== Workspace Diagnostics ==="
-            echo "Current Dir: $(pwd)"
-            echo "Root files:"
-            ls -la
-            echo "Apps demo files:"
-            ls -la apps/demo/ || true
-            echo "Packages core files:"
-            ls -la packages/core/ || true
-            echo "Packages adapter files:"
-            ls -la packages/nestjs-adapter/ || true
-            echo "Root node_modules/@auth-template:"
-            ls -la node_modules/@auth-template/ || true
-            echo "Demo node_modules/@auth-template:"
-            ls -la apps/demo/node_modules/@auth-template/ || true
-
+            # Restart or start application with PM2
             if pm2 describe auth-backend-app &> /dev/null; then
+              echo "Application exists, restarting..."
               pm2 restart auth-backend-app
             else
-              pm2 start apps/demo/dist/main.js --name "auth-backend-app"
+              echo "Application does not exist, starting..."
+              pm2 start dist/main.js --name "auth-backend-app"
             fi
