@@ -1,0 +1,54 @@
+{
+  "name": "@auth-template/express-adapter",
+  "version": "1.0.0",
+  "description": "Express.js adapter for auth-template core",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "test": "pnpm exec jest --passWithNoTests",
+    "test:watch": "pnpm exec jest --watch",
+    "test:cov": "pnpm exec jest --coverage",
+    "lint": "pnpm exec eslint src/**/*.ts",
+    "lint:fix": "pnpm exec eslint src/**/*.ts --fix"
+  },
+  "keywords": [
+    "express",
+    "authentication",
+    "jwt",
+    "clean-architecture"
+  ],
+  "author": "Ahmed Salah",
+  "license": "MIT",
+  "peerDependencies": {
+    "express": "^4.19.0 || ^5.0.0",
+    "typeorm": "^0.3.0"
+  },
+  "dependencies": {
+    "@auth-template/core": "workspace:*",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.13",
+    "zod": "^3.23.8",
+    "ioredis": "^5.3.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^29.5.11",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.11.0",
+    "@types/nodemailer": "^6.4.14",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  }
+}
