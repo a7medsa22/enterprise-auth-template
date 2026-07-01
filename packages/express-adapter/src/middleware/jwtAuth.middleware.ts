@@ -24,7 +24,11 @@ export function createJwtAuthMiddleware(tokenGenerator: ITokenGenerator): Reques
 
       req.user = result.getValue();
       next();
+<<<<<<< HEAD
     } catch {
+=======
+    } catch (error) {
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
       res.status(401).json({ message: 'Authentication failed' });
     }
   };

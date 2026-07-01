@@ -33,10 +33,21 @@ export class JwtTokenGenerator implements ITokenGenerator {
   async generateRefreshToken(userId: UserId): Promise<Result<string>> {
     try {
       const jti = randomUUID();
+<<<<<<< HEAD
       const token = jwt.sign({ type: 'refresh', jti }, this.config.jwt.refreshSecret, {
         expiresIn: this.config.jwt.refreshExpiration as any,
         subject: userId.getValue(),
       });
+=======
+      const token = jwt.sign(
+        { type: 'refresh', jti },
+        this.config.jwt.refreshSecret,
+        {
+          expiresIn: this.config.jwt.refreshExpiration as any,
+          subject: userId.getValue(),
+        }
+      );
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 
       const tokenOrError = Token.create(token);
       if (tokenOrError.isFailure) {

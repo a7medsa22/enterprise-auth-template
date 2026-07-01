@@ -1,11 +1,19 @@
 import express, { Request, Response, NextFunction } from 'express';
 import request from 'supertest';
 import { z } from 'zod';
+<<<<<<< HEAD
 import { Result } from '@auth-template/core';
 import { createValidateMiddleware } from '../middleware/validate.middleware';
 import { createRolesMiddleware } from '../middleware/roles.middleware';
 import { createJwtAuthMiddleware } from '../middleware/jwtAuth.middleware';
 import { createAuthRouter } from '../router/authRouter';
+=======
+import { Result, UserId } from '@auth-template/core';
+import { createValidateMiddleware } from '../middleware/validate.middleware';
+import { createRolesMiddleware } from '../middleware/roles.middleware';
+import { createJwtAuthMiddleware } from '../middleware/jwtAuth.middleware';
+import { createAuthRouter, AuthRouterDeps } from '../router/authRouter';
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 
 describe('Express Adapter Test Suite', () => {
   // ==========================================
@@ -24,14 +32,26 @@ describe('Express Adapter Test Suite', () => {
     });
 
     it('should return 200 and sanitised body when valid data is passed', async () => {
+<<<<<<< HEAD
       const response = await request(app).post('/test-val').send({ name: 'Ahmed', age: 30 });
+=======
+      const response = await request(app)
+        .post('/test-val')
+        .send({ name: 'Ahmed', age: 30 });
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 
       expect(response.status).toBe(200);
       expect(response.body.body).toEqual({ name: 'Ahmed', age: 30 });
     });
 
     it('should return 400 validation error when invalid data is passed', async () => {
+<<<<<<< HEAD
       const response = await request(app).post('/test-val').send({ name: 'Ah', age: -5 });
+=======
+      const response = await request(app)
+        .post('/test-val')
+        .send({ name: 'Ah', age: -5 });
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('message', 'Validation failed');
@@ -88,6 +108,7 @@ describe('Express Adapter Test Suite', () => {
       };
 
       app = express();
+<<<<<<< HEAD
       app.get(
         '/protected',
         createJwtAuthMiddleware(mockTokenGenerator),
@@ -95,6 +116,11 @@ describe('Express Adapter Test Suite', () => {
           res.status(200).json({ user: req.user });
         },
       );
+=======
+      app.get('/protected', createJwtAuthMiddleware(mockTokenGenerator), (req: Request, res: Response) => {
+        res.status(200).json({ user: req.user });
+      });
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
     });
 
     it('should return 401 if Authorization header is missing', async () => {
@@ -108,10 +134,14 @@ describe('Express Adapter Test Suite', () => {
         .get('/protected')
         .set('Authorization', 'InvalidFormat token123');
       expect(response.status).toBe(401);
+<<<<<<< HEAD
       expect(response.body).toHaveProperty(
         'message',
         'Invalid authorization format. Expected Bearer <token>',
       );
+=======
+      expect(response.body).toHaveProperty('message', 'Invalid authorization format. Expected Bearer <token>');
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
     });
 
     it('should return 401 if token verification fails', async () => {
@@ -173,7 +203,11 @@ describe('Express Adapter Test Suite', () => {
           email: 'user@example.com',
           accessToken: 'access_token_123',
           refreshToken: 'refresh_token_123',
+<<<<<<< HEAD
         }),
+=======
+        })
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
       );
 
       const response = await request(app)

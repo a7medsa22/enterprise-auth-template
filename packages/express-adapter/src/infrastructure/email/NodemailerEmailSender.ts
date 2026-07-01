@@ -13,7 +13,11 @@ export class NodemailerEmailSender implements IEmailSender {
 
     if (!host || !user || !pass) {
       console.warn(
+<<<<<<< HEAD
         '[NodemailerEmailSender] SMTP configuration is missing or incomplete. Falling back to logging emails to the console.',
+=======
+        '[NodemailerEmailSender] SMTP configuration is missing or incomplete. Falling back to logging emails to the console.'
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
       );
       this.useFallback = true;
     } else {

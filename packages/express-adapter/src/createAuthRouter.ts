@@ -12,16 +12,26 @@ import {
   Result,
 } from '@auth-template/core';
 import { AuthConfig, loadConfig } from './config';
+<<<<<<< HEAD
 import {
   BaseMemoryCache,
   BaseRedisCache,
   UserEntity,
   RefreshTokenEntity,
 } from '@auth-template/typeorm';
+=======
+import { UserEntity } from './persistence/entities/UserEntity';
+import { RefreshTokenEntity } from './persistence/entities/RefreshTokenEntity';
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 import { TypeOrmUserRepository } from './persistence/repositories/TypeOrmUserRepository';
 import { TypeOrmTokenRepository } from './persistence/repositories/TypeOrmTokenRepository';
 import { BcryptHasher } from './infrastructure/security/BcryptHasher';
 import { JwtTokenGenerator } from './infrastructure/security/JwtTokenGenerator';
+<<<<<<< HEAD
+=======
+import { MemoryCache } from './infrastructure/security/MemoryCache';
+import { RedisCache } from './infrastructure/security/RedisCache';
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 import { NodemailerEmailSender } from './infrastructure/email/NodemailerEmailSender';
 import { createJwtAuthMiddleware } from './middleware/jwtAuth.middleware';
 import { createRolesMiddleware } from './middleware/roles.middleware';
@@ -78,8 +88,13 @@ export function createAuthRouter(options: ExpressAuthOptions): {
 
   const cache =
     options.cacheProvider === 'redis' && options.redisClient
+<<<<<<< HEAD
       ? new BaseRedisCache(options.redisClient)
       : new BaseMemoryCache();
+=======
+      ? new RedisCache(options.redisClient)
+      : new MemoryCache();
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 
   // 4. Initialize Email Sender
   const emailSender = new NodemailerEmailSender(config);
@@ -110,7 +125,11 @@ export function createAuthRouter(options: ExpressAuthOptions): {
     passwordHasher,
     tokenGenerator,
     logger,
+<<<<<<< HEAD
     eventBus,
+=======
+    eventBus
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
   );
 
   const loginUser = new LoginUser(
@@ -119,22 +138,46 @@ export function createAuthRouter(options: ExpressAuthOptions): {
     tokenGenerator,
     rateLimiter,
     logger,
+<<<<<<< HEAD
     eventBus,
+=======
+    eventBus
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
   );
 
   const refreshToken = new RefreshTokenUseCase(
     userRepository,
     tokenRepository,
     tokenGenerator,
+<<<<<<< HEAD
     logger,
+=======
+    logger
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
   );
 
   const logoutUser = new LogoutUser(tokenRepository, logger);
   const logoutAllDevices = new LogoutAllDevices(tokenRepository, logger);
 
+<<<<<<< HEAD
   const verifyEmail = new VerifyEmail(userRepository, tokenGenerator, eventBus, logger);
 
   const changePassword = new ChangePassword(userRepository, passwordHasher, eventBus, logger);
+=======
+  const verifyEmail = new VerifyEmail(
+    userRepository,
+    tokenGenerator,
+    eventBus,
+    logger
+  );
+
+  const changePassword = new ChangePassword(
+    userRepository,
+    passwordHasher,
+    eventBus,
+    logger
+  );
+>>>>>>> 3e614b89a5fc6f69382ca66452716f838e414f9e
 
   // 7. Middlewares
   const jwtMiddleware = createJwtAuthMiddleware(tokenGenerator);
