@@ -1,0 +1,32 @@
+{
+  "name": "@auth-template/typeorm",
+  "version": "1.0.0",
+  "description": "Shared TypeORM persistence layer for auth-template adapters",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "typeorm",
+    "persistence",
+    "clean-architecture"
+  ],
+  "author": "Ahmed Salah",
+  "license": "MIT",
+  "peerDependencies": {
+    "typeorm": "^0.3.0"
+  },
+  "dependencies": {
+    "@auth-template/core": "workspace:*",
+    "ioredis": "^5.3.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

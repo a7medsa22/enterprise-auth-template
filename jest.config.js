@@ -19,5 +19,7 @@ module.exports = {
   moduleNameMapper: {
     '^@auth-template/core(.*)$': '<rootDir>/packages/core/src$1',
     '^@auth-template/nestjs-adapter(.*)$': '<rootDir>/packages/nestjs-adapter/src$1',
+    '^@auth-template/typeorm(.*)$': '<rootDir>/packages/typeorm/src$1',
+    '^@auth-template/express-adapter(.*)$': '<rootDir>/packages/express-adapter/src$1',
   },
 };
