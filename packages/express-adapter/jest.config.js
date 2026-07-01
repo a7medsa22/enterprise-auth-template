@@ -7,4 +7,8 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
+  moduleNameMapper: {
+    '^@auth-template/core(.*)$': '<rootDir>/../core/src$1',
+    '^@auth-template/typeorm(.*)$': '<rootDir>/../typeorm/src$1',
+  },
 };

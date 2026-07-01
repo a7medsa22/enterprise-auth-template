@@ -11,15 +11,21 @@
     "paths": {
       "@auth-template/core": ["packages/core/dist"],
       "@auth-template/core/*": ["packages/core/dist/*"],
+      "@auth-template/typeorm": ["packages/typeorm/dist"],
+      "@auth-template/typeorm/*": ["packages/typeorm/dist/*"],
       "@auth-template/nestjs-adapter": ["packages/nestjs-adapter/dist"],
-      "@auth-template/nestjs-adapter/*": ["packages/nestjs-adapter/dist/*"]
+      "@auth-template/nestjs-adapter/*": ["packages/nestjs-adapter/dist/*"],
+      "@auth-template/express-adapter": ["packages/express-adapter/dist"],
+      "@auth-template/express-adapter/*": ["packages/express-adapter/dist/*"]
     }
   },
 
   "files": [],
   "references": [
     { "path": "packages/core" },
+    { "path": "packages/typeorm" },
     { "path": "packages/nestjs-adapter" },
+    { "path": "packages/express-adapter" },
     { "path": "apps/demo" }
   ],
   "exclude": ["node_modules", "dist"]
