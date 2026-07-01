@@ -30,10 +30,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import authConfig from './config/auth.config';
 import databaseConfig from './config/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './presentation/typeorm/entities/UserEntity';
-import { SessionEntity } from './presentation/typeorm/entities/SessionEntity';
-import { RefreshTokenEntity } from './presentation/typeorm/entities/RefreshTokenEntity';
-import { AuditLogEntity } from './presentation/typeorm/entities/AuditLogEntity';
+import {
+  UserEntity,
+  SessionEntity,
+  RefreshTokenEntity,
+  AuditLogEntity,
+} from '@auth-template/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './presentation/controllers/AuthController';

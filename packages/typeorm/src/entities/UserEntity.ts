@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+
 @Entity('users')
 @Index(['email'], { unique: true })
 export class UserEntity {
