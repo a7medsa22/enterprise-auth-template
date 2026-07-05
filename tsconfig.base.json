@@ -19,14 +19,5 @@
       "@auth-template/express-adapter/*": ["packages/express-adapter/dist/*"]
     }
   },
-
-  "files": [],
-  "references": [
-    { "path": "packages/core" },
-    { "path": "packages/typeorm" },
-    { "path": "packages/nestjs-adapter" },
-    { "path": "packages/express-adapter" },
-    { "path": "apps/demo" }
-  ],
   "exclude": ["node_modules", "dist"]
 }
