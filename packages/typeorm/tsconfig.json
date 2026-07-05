@@ -3,12 +3,17 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "./dist",
+    "baseUrl": ".",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "composite": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@auth-template/core": ["../core/dist"],
+      "@auth-template/core/*": ["../core/dist/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules"],
