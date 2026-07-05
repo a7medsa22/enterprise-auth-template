@@ -7,6 +7,8 @@
   "moduleNameMapper": {
     "^@auth-template/nestjs-adapter$": "<rootDir>/../packages/nestjs-adapter/src/index",
     "^@auth-template/nestjs-adapter/(.*)$": "<rootDir>/../packages/nestjs-adapter/src/$1",
+    "^@auth-template/typeorm$": "<rootDir>/../packages/typeorm/src/index",
+    "^@auth-template/typeorm/(.*)$": "<rootDir>/../packages/typeorm/src/$1",
     "^@auth-template/core$": "<rootDir>/../packages/core/src/index",
     "^@auth-template/core/(.*)$": "<rootDir>/../packages/core/src/$1"
   },
