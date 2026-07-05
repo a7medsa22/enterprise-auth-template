@@ -17,8 +17,12 @@
     "paths": {
       "@auth-template/core": ["./packages/core/src/index"],
       "@auth-template/core/*": ["./packages/core/src/*"],
+      "@auth-template/typeorm": ["./packages/typeorm/src/index"],
+      "@auth-template/typeorm/*": ["./packages/typeorm/src/*"],
       "@auth-template/nestjs-adapter": ["./packages/nestjs-adapter/src/index"],
-      "@auth-template/nestjs-adapter/*": ["./packages/nestjs-adapter/src/*"]
+      "@auth-template/nestjs-adapter/*": ["./packages/nestjs-adapter/src/*"],
+      "@auth-template/express-adapter": ["./packages/express-adapter/src/index"],
+      "@auth-template/express-adapter/*": ["./packages/express-adapter/src/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

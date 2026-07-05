@@ -9,13 +9,13 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@auth-template/core": ["packages/core/dist"],
+      "@auth-template/core": ["packages/core/dist/index"],
       "@auth-template/core/*": ["packages/core/dist/*"],
-      "@auth-template/typeorm": ["packages/typeorm/dist"],
+      "@auth-template/typeorm": ["packages/typeorm/dist/index"],
       "@auth-template/typeorm/*": ["packages/typeorm/dist/*"],
-      "@auth-template/nestjs-adapter": ["packages/nestjs-adapter/dist"],
+      "@auth-template/nestjs-adapter": ["packages/nestjs-adapter/dist/index"],
       "@auth-template/nestjs-adapter/*": ["packages/nestjs-adapter/dist/*"],
-      "@auth-template/express-adapter": ["packages/express-adapter/dist"],
+      "@auth-template/express-adapter": ["packages/express-adapter/dist/index"],
       "@auth-template/express-adapter/*": ["packages/express-adapter/dist/*"]
     }
   },
