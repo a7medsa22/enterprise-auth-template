@@ -8,7 +8,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "tsc -b tsconfig.base.json",
     "build:core": "pnpm --filter \"@auth-template/core\" run build",
     "build:nestjs": "pnpm --filter \"@auth-template/nestjs-adapter\" run build",
     "build:demo": "pnpm --filter \"demo-api\" run build",
