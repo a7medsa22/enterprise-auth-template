@@ -11,9 +11,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "@auth-template/core": ["../core/dist"],
+      "@auth-template/core": ["../core/dist/index"],
       "@auth-template/core/*": ["../core/dist/*"],
-      "@auth-template/typeorm": ["../typeorm/dist"],
+      "@auth-template/typeorm": ["../typeorm/dist/index"],
       "@auth-template/typeorm/*": ["../typeorm/dist/*"]
     }
   },
