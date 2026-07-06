@@ -37,9 +37,21 @@
     "typescript": "^5.3.3"
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./domain": "./dist/domain/index.js",
-    "./application": "./dist/application/index.js",
-    "./shared": "./dist/shared/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./domain": {
+      "types": "./dist/domain/index.d.ts",
+      "default": "./dist/domain/index.js"
+    },
+    "./application": {
+      "types": "./dist/application/index.d.ts",
+      "default": "./dist/application/index.js"
+    },
+    "./shared": {
+      "types": "./dist/shared/index.d.ts",
+      "default": "./dist/shared/index.js"
+    }
   }
 }
