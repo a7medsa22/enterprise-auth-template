@@ -2,10 +2,12 @@
 
 ## Adding a New Use Case
 
-### Step 1: Create the Use Case
+### Step 1: Create the Use Case in `@auth-template/core`
 
 ```typescript
 // packages/core/src/application/use-cases/auth/ResetPassword.ts
+
+import { Email, Password, Result, IUserRepository, IPasswordHasher } from '@auth-template/core';
 
 export interface ResetPasswordDTO {
   email: string;
@@ -58,7 +60,7 @@ export class ResetPassword {
 }
 ```
 
-### Step 2: Add to Module
+### Step 2: Register in NestJS Module (`AuthModule.ts`)
 
 ```typescript
 providers: [
@@ -71,7 +73,7 @@ providers: [
 ],
 ```
 
-### Step 3: Create Controller Endpoint
+### Step 3: Create Controller Endpoint (NestJS)
 
 ```typescript
 @Public()
@@ -85,96 +87,103 @@ async resetPassword(@Body() dto: ResetPasswordRequest) {
 }
 ```
 
-## Adding a New Repository
+---
 
-### Step 1: Define Interface
+## Extending the Shared Persistence Layer (`@auth-template/typeorm`)
 
-```typescript
-// packages/core/src/domain/repositories/INotificationRepository.ts
-export interface INotificationRepository {
-  save(notification: Notification): Promise<Result<void>>;
-  findByUserId(userId: UserId): Promise<Result<Notification[]>>;
-}
-```
+All database persistence rules are unified in `@auth-template/typeorm` to avoid code duplication across framework adapters.
 
-### Step 2: Implement
+### Extending `BaseTypeOrmUserRepository`
+
+If you need custom database methods for users (e.g. `findByPhoneNumber`):
 
 ```typescript
-@Injectable()
-export class TypeOrmNotificationRepository implements INotificationRepository {
-  async save(notification: Notification): Promise<Result<void>> {
+// Custom repository implementation extending the shared base
+import { BaseTypeOrmUserRepository, UserEntity, UserMapper } from '@auth-template/typeorm';
+import { Result, User } from '@auth-template/core';
+
+export class CustomUserRepository extends BaseTypeOrmUserRepository {
+  async findByPhoneNumber(phone: string): Promise<Result<User>> {
     try {
-      const entity = NotificationMapper.toPersistence(notification);
-      await this.repository.save(entity);
-      return Result.ok();
+      const entity = await this.ormRepository.findOne({ where: { phone } as any });
+      if (!entity) return Result.fail('User not found');
+      return Result.ok(UserMapper.toDomain(entity));
     } catch (error) {
-      return Result.fail(`Failed to save: ${error.message}`);
+      return Result.fail(`Database query error: ${error}`);
     }
   }
 }
 ```
 
-### Step 3: Register
+---
+
+## Using & Customizing the Express Adapter (`@auth-template/express-adapter`)
+
+The `@auth-template/express-adapter` package provides a ready-to-use Express router factory `createAuthRouter()` and middleware utilities.
+
+### Basic Setup
 
 ```typescript
-providers: [
-  {
-    provide: 'INotificationRepository',
-    useClass: TypeOrmNotificationRepository,
+import express from 'express';
+import { createAuthRouter } from '@auth-template/express-adapter';
+import { AppDataSource } from './data-source';
+
+const app = express();
+app.use(express.json());
+
+const { router, jwtMiddleware, requireRoles, useCases } = createAuthRouter({
+  dataSource: AppDataSource,
+  cacheProvider: 'redis',
+  redisClient: redisClientInstance,
+  config: {
+    jwt: {
+      accessSecret: process.env.JWT_ACCESS_SECRET!,
+      accessExpiration: '15m',
+    },
   },
-],
+});
+
+// Mount default auth routes
+app.use('/auth', router);
+
+// Use returned JWT middleware on protected routes
+app.get('/api/profile', jwtMiddleware, (req, res) => {
+  res.json({ user: req.user });
+});
+
+// Use role checking middleware
+app.get('/api/admin', jwtMiddleware, requireRoles('ADMIN'), (req, res) => {
+  res.json({ message: 'Admin access granted' });
+});
 ```
 
-## Adding a New Framework Adapter
+---
 
-```text
-packages/express-adapter/
-├── src/
-│   ├── infrastructure/
-│   │   └── (same as NestJS)
-│   ├── presentation/
-│   │   ├── routes/
-│   │   │   └── auth.routes.ts
-│   │   ├── middlewares/
-│   │   │   ├── auth.middleware.ts
-│   │   │   └── roles.middleware.ts
-│   │   └── controllers/
-│   │       └── auth.controller.ts
-│   └── index.ts
-└── package.json
-```
+## Creating a Custom Framework Adapter (e.g., Fastify / Koa)
+
+To build an adapter for a new web framework:
+
+1. Import entities and base repositories from `@auth-template/typeorm`.
+2. Import domain use cases from `@auth-template/core`.
+3. Wrap use case execution into framework-native route handlers.
 
 ```typescript
-// packages/express-adapter/src/presentation/routes/auth.routes.ts
+// Example: Fastify route handler
+import { RegisterUserUseCase } from '@auth-template/core';
+import { FastifyInstance } from 'fastify';
 
-import { Router } from 'express';
-import { RegisterUser } from '@auth-template/core';
-
-export function createAuthRouter(dependencies) {
-  const router = Router();
-
-  router.post('/register', async (req, res) => {
-    const registerUser = new RegisterUser(
-      dependencies.userRepository,
-      dependencies.passwordHasher,
-      dependencies.tokenGenerator,
-      dependencies.emailSender,
-      dependencies.eventBus,
-      dependencies.logger,
-    );
-
-    const result = await registerUser.execute(req.body);
-
+export async function registerAuthRoutes(fastify: FastifyInstance, opts: { registerUser: RegisterUserUseCase }) {
+  fastify.post('/auth/register', async (request, reply) => {
+    const result = await opts.registerUser.execute(request.body as any);
     if (result.isFailure) {
-      return res.status(400).json({ error: result.error });
+      return reply.status(400).send({ message: result.error });
     }
-
-    res.status(201).json(result.getValue());
+    return reply.status(201).send(result.getValue());
   });
-
-  return router;
 }
 ```
+
+---
 
 ## Environment Configuration
 
@@ -184,6 +193,8 @@ export function createAuthRouter(dependencies) {
 NODE_ENV=development
 JWT_ACCESS_EXPIRATION=15m
 BCRYPT_ROUNDS=10
+SMTP_HOST=localhost
+SMTP_PORT=1025
 ```
 
 ### Production
@@ -192,4 +203,7 @@ BCRYPT_ROUNDS=10
 NODE_ENV=production
 JWT_ACCESS_EXPIRATION=5m
 BCRYPT_ROUNDS=12
+DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
+REDIS_URL=rediss://default:pass@endpoint.upstash.com:6379
 ```
+

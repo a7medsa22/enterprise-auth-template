@@ -35,6 +35,27 @@ jobs:
         ports:
           - 6379:6379
 
+    # ──────────────────────────────────────────────────────────────────
+    # Default env shared by ALL steps — prevents JWT errors during init
+    # ──────────────────────────────────────────────────────────────────
+    env:
+      NODE_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: auth_db_test
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: ci-test-access-secret-key-min-32-chars
+      JWT_REFRESH_SECRET: ci-test-refresh-secret-key-min-32-chars
+      JWT_ACCESS_EXPIRATION: 15m
+      JWT_REFRESH_EXPIRATION: 7d
+      BCRYPT_ROUNDS: 4
+      SMTP_HOST: ''
+      SMTP_USER: ''
+      SMTP_PASS: ''
+
     steps:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -48,6 +69,7 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -60,38 +82,12 @@ jobs:
 
       - name: Run unit tests
         run: pnpm run test
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: auth_db_test
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
 
       - name: Run integration tests
         run: pnpm run test:integration
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: auth_db_test
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
 
       - name: Run e2e tests
         run: pnpm run test:e2e
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: auth_db_test
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
-          JWT_ACCESS_SECRET: test-super-secret-key-for-e2e-testing
-          JWT_REFRESH_SECRET: test-super-secret-refresh-key-for-e2e-testing
 
       - name: Upload coverage
         uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0

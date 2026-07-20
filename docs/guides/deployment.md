@@ -4,42 +4,120 @@
 
 ### Security
 
-- [ ] Change default JWT secrets
+- [ ] Change default JWT secrets (`JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`)
 - [ ] Enable HTTPS
-- [ ] Configure CORS
+- [ ] Configure CORS origins
 - [ ] Set up rate limiting
 - [ ] Enable audit logging
 
 ### Database
 
-- [ ] Set up backups
-- [ ] Configure connection pooling
-- [ ] Set up read replicas
-- [ ] Enable SSL connections
+- [ ] Connect to managed database (Neon PostgreSQL or AWS RDS) with SSL
+- [ ] Set up backups & retention policy
+- [ ] Configure connection pooling (`max: 20`)
+
+### Managed Redis / Queue
+
+- [ ] Configure Redis / Upstash Redis with TLS (`rediss://`)
+- [ ] Verify Bull queue connection for async email jobs
 
 ### Infrastructure
 
-- [ ] Set up health checks
-- [ ] Configure auto-scaling
-- [ ] Set up load balancer
-- [ ] Configure monitoring
+- [ ] Set up health checks (`/health`)
+- [ ] Configure PM2 process management & auto-restart
+- [ ] Set up load balancer & SSL termination
+- [ ] Configure monitoring & alerting
+
+---
 
 ## Deployment Options
 
-### Option 1: Docker on AWS ECS
+### Option 1: AWS EC2 with PM2 & GitHub Actions (Automated CI/CD)
+
+The repository includes a GitHub Actions workflow (`.github/workflows/build.yml`) that deploys directly to AWS EC2 using PM2.
+
+#### Environment Setup on EC2
+
+```bash
+# 1. Install Node.js 24 and PNPM
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install -g pnpm pm2
+
+# 2. Setup project directory
+mkdir -p /var/www/auth-template
+cd /var/www/auth-template
+
+# 3. Configure production .env
+cat << 'EOF' > .env
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=postgresql://user:password@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
+REDIS_URL=rediss://default:password@xxx.upstash.io:6379
+JWT_ACCESS_SECRET=your-production-access-secret
+JWT_REFRESH_SECRET=your-production-refresh-secret
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_USER=apikey
+SMTP_PASS=your-sendgrid-api-key
+SMTP_SECURE=false
+SMTP_FROM="Auth App <noreply@yourdomain.com>"
+EOF
+```
+
+#### GitHub Actions Deployment Setup
+
+In your GitHub repository settings, configure secrets:
+
+- `EC2_HOST`: Elastic IP of your EC2 instance
+- `EC2_USERNAME`: SSH user (e.g. `ubuntu` or `ec2-user`)
+- `EC2_SSH_KEY`: Private key content for SSH connection
+
+When code is pushed to `main`, `.github/workflows/build.yml` will automatically build the monorepo using `pnpm build`, upload artifacts via SSH, and run:
+
+```bash
+pnpm install --frozen-lockfile --prod
+pm2 restart auth-api || pm2 start dist/main.js --name "auth-api"
+```
+
+---
+
+### Option 2: Managed Cloud Databases & Cache
+
+#### Neon PostgreSQL Setup
+
+Set `DATABASE_URL` in `.env`:
+
+```env
+DATABASE_URL=postgresql://user:password@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
+```
+
+TypeORM and `@auth-template/typeorm` automatically parse SSL configuration for Neon endpoints.
+
+#### Upstash Redis Setup
+
+Set `REDIS_URL` or `UPSTASH_REDIS_URL` in `.env`:
+
+```env
+CACHE_PROVIDER=redis
+REDIS_URL=rediss://default:password@endpoint.upstash.io:6379
+```
+
+NestJS `AuthModule` automatically enables TLS configuration when detecting `rediss://` or `upstash.com` endpoints.
+
+---
+
+### Option 3: Docker on AWS ECS
 
 #### Step 1: Build and Push Image
 
 ```bash
 # Build
-docker build -t auth-template:latest .
+docker build -t auth-template:latest -f docker/Dockerfile .
 
-# Tag
+# Tag & Push
 docker tag auth-template:latest your-repo:latest
-
-# Push
 docker push your-repo:latest
-
 ```
 
 #### Step 2: Create ECS Task Definition
@@ -61,10 +139,13 @@ docker push your-repo:latest
         }
       ],
       "environment": [
-        { "name": "NODE_ENV", "value": "production" },
-        { "name": "DB_HOST", "value": "your-rds-endpoint" }
+        { "name": "NODE_ENV", "value": "production" }
       ],
       "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:region:account-id:secret:db-url"
+        },
         {
           "name": "JWT_ACCESS_SECRET",
           "valueFrom": "arn:aws:secretsmanager:region:account-id:secret:jwt-access"
@@ -81,21 +162,9 @@ docker push your-repo:latest
 }
 ```
 
-#### Step 3: Create ECS Service
+---
 
-```bash
-aws ecs create-service \
-  --cluster production \
-  --service-name auth-api \
-  --task-definition auth-template:1 \
-  --desired-count 3 \
-  --launch-type FARGATE \
-  --load-balancers targetGroupArn=arn:aws:...,containerName=api,containerPort=3000
-```
-
-### Option 2: Kubernetes
-
-#### deployment.yaml
+### Option 4: Kubernetes Deployment
 
 ```yaml
 apiVersion: apps/v1
@@ -117,19 +186,11 @@ spec:
           image: your-repo/auth-template:latest
           ports:
             - containerPort: 3000
-          env:
-            - name: NODE_ENV
-              value: 'production'
-            - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: auth-config
-                  key: db-host
-            - name: JWT_ACCESS_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: auth-secrets
-                  key: jwt-access-secret
+          envFrom:
+            - configMapRef:
+                name: auth-config
+            - secretRef:
+                name: auth-secrets
           resources:
             limits:
               memory: '512Mi'
@@ -149,82 +210,46 @@ spec:
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 5
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: auth-api-service
-spec:
-  selector:
-    app: auth-api
-  ports:
-    - port: 80
-      targetPort: 3000
-  type: LoadBalancer
 ```
 
 Deploy:
 
 ```bash
 kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/secrets.yaml
 ```
 
-### Option 3: Digital Ocean
+---
 
-```yaml
-# app.yaml
-name: auth-template
-services:
-  - name: api
-    instance_count: 2
-    http_port: 3000
-    health_check:
-      http_path: /health
-```
+## Monitoring & Health Checks
+
+### Health Check Endpoint
 
 ```bash
-doctl apps create --spec app.yaml
+curl http://localhost:3000/health
 ```
 
-### Deploy
-
-```bash
-doctl apps create --spec app.yaml
-```
-
-## Monitoring
-
-### Health Checks
-
-```typescript
-@Get('health')
-async health() {
-  return {
-    status: 'ok',
-    services: {
-      database: await this.checkDatabase(),
-      redis: await this.checkRedis(),
-    },
-  };
+Expected Response:
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-07-20T22:00:00.000Z"
 }
 ```
 
-### Metrics to Track
+### Key Metrics to Monitor
 
-- Request rate
-- Response time
-- Error rate
-- Active users
-- Database connections
+- **HTTP Request Latency**: P95 < 100ms for protected endpoints
+- **Database Connection Pool**: Active connection count & idle timeout
+- **Redis & Bull Queue**: Queue size (`email` queue depth) and job failure rates
+- **Process Memory**: Node.js heap usage under PM2
 
 ## Backup Strategy
 
 ```bash
-# Daily backups
-pg_dump -h localhost -U postgres auth_db > backup_$(date +%Y%m%d).sql
+# PostgreSQL Dump
+pg_dump "$DATABASE_URL" > backup_$(date +%Y%m%d).sql
 
 # Retain for 30 days
 find /backups -name "backup_*.sql" -mtime +30 -delete
 ```
+
