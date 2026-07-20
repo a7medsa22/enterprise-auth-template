@@ -264,12 +264,35 @@ export class AuthModule {
         BullModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
-          useFactory: (configService: ConfigService) => ({
-            redis: {
-              host: configService.get('REDIS_HOST', 'localhost'),
-              port: parseInt(configService.get('REDIS_PORT', '6379'), 10),
-            },
-          }),
+          useFactory: (configService: ConfigService) => {
+            const redisUrl =
+              configService.get<string>('REDIS_URL') ||
+              configService.get<string>('UPSTASH_REDIS_URL');
+            const isTls =
+              configService.get<string>('REDIS_TLS') === 'true' ||
+              (redisUrl
+                ? redisUrl.startsWith('rediss://') || redisUrl.includes('upstash.com')
+                : (configService.get<string>('REDIS_HOST') || '').includes('upstash.com'));
+
+            const tlsOption = isTls ? { rejectUnauthorized: false } : undefined;
+
+            if (redisUrl) {
+              return {
+                url: redisUrl,
+                redis: tlsOption ? { tls: tlsOption } : {},
+              };
+            }
+
+            return {
+              redis: {
+                host: configService.get('REDIS_HOST', 'localhost'),
+                port: parseInt(configService.get('REDIS_PORT', '6379'), 10),
+                password: configService.get('REDIS_PASSWORD') || undefined,
+                username: configService.get('REDIS_USERNAME') || undefined,
+                tls: tlsOption,
+              },
+            };
+          },
         }),
         BullModule.registerQueue({
           name: 'email',
