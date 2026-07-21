@@ -8,6 +8,7 @@ import {
   ChangePassword,
   VerifyEmail,
 } from '@auth-template/core';
+import { TokenPayload } from '@auth-template/core/application';
 import { createValidateMiddleware } from '../middleware/validate.middleware';
 import {
   registerSchema,
@@ -143,7 +144,8 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
     deps.jwtMiddleware,
     createValidateMiddleware(refreshTokenSchema),
     asyncHandler(async (req: Request, res: Response) => {
-      const userId = req.user?.userId;
+      const user = req.user as TokenPayload | undefined;
+      const userId = user?.userId;
       if (!userId) {
         res.status(401).json({ message: 'User identifier not found in request' });
         return;
@@ -168,7 +170,8 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
     '/logout-all',
     deps.jwtMiddleware,
     asyncHandler(async (req: Request, res: Response) => {
-      const userId = req.user?.userId;
+      const user = req.user as TokenPayload | undefined;
+      const userId = user?.userId;
       if (!userId) {
         res.status(401).json({ message: 'User identifier not found in request' });
         return;
@@ -191,7 +194,8 @@ export function createAuthRouter(deps: AuthRouterDeps): Router {
     deps.jwtMiddleware,
     createValidateMiddleware(changePasswordSchema),
     asyncHandler(async (req: Request, res: Response) => {
-      const userId = req.user?.userId;
+      const user = req.user as TokenPayload | undefined;
+      const userId = user?.userId;
       if (!userId) {
         res.status(401).json({ message: 'User identifier not found in request' });
         return;
