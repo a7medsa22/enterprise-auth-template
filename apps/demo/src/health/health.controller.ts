@@ -1,5 +1,4 @@
-import { Controller } from '@nestjs/common/decorators/core/controller.decorator';
-import { Get } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { Controller, Get } from '@nestjs/common';
 import { Public } from '@auth-template/nestjs-adapter';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';

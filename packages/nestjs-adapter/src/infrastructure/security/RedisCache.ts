@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
-import { Inject } from '@nestjs/common/decorators/core/inject.decorator';
+import { Injectable, Inject } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { BaseRedisCache } from '@auth-template/typeorm';
 

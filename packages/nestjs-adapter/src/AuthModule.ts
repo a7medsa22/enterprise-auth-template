@@ -26,6 +26,7 @@ import { JwtAuthGuard } from './presentation/guards/jwt-auth.guard';
 import { RolesGuard } from './presentation/guards/roles.guard';
 import { RedisCache } from './infrastructure/security/RedisCache';
 import { MemoryCache } from './infrastructure/security/MemoryCache';
+import { Redis } from 'ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import authConfig from './config/auth.config';
 import databaseConfig from './config/database.config';
@@ -50,7 +51,6 @@ export interface AuthModuleOptions {
   cacheProvider?: 'redis' | 'memory';
   redisClient?: any;
 }
-@Global()
 @Module({})
 export class AuthModule {
   static forRoot(options: AuthModuleOptions = {}): DynamicModule {
@@ -276,20 +276,25 @@ export class AuthModule {
 
             const tlsOption = isTls ? { rejectUnauthorized: false } : undefined;
 
-            if (redisUrl) {
-              return {
-                url: redisUrl,
-                redis: tlsOption ? { tls: tlsOption } : {},
-              };
-            }
-
             return {
-              redis: {
-                host: configService.get('REDIS_HOST', 'localhost'),
-                port: parseInt(configService.get('REDIS_PORT', '6379'), 10),
-                password: configService.get('REDIS_PASSWORD') || undefined,
-                username: configService.get('REDIS_USERNAME') || undefined,
-                tls: tlsOption,
+              createClient: (type: string, redisOpts: any) => {
+                const clientOpts = {
+                  ...redisOpts,
+                  db: 0,
+                  maxRetriesPerRequest: null,
+                  enableReadyCheck: false,
+                  tls: tlsOption,
+                };
+                if (redisUrl) {
+                  return new Redis(redisUrl, clientOpts);
+                }
+                return new Redis({
+                  host: configService.get('REDIS_HOST', 'localhost'),
+                  port: parseInt(configService.get('REDIS_PORT', '6379'), 10),
+                  password: configService.get('REDIS_PASSWORD') || undefined,
+                  username: configService.get('REDIS_USERNAME') || undefined,
+                  ...clientOpts,
+                });
               },
             };
           },

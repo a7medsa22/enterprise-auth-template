@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
+import { Injectable } from '@nestjs/common';
 import { BaseMemoryCache } from '@auth-template/typeorm';
 
 @Injectable()

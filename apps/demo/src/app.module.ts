@@ -15,6 +15,49 @@ import { Module } from '@nestjs/common';
 import { HealthModule } from './health/health.module';
 import { Redis } from 'ioredis';
 
+function getTypeOrmOptions(): DataSourceOptions {
+  const dbUrl = process.env.DATABASE_URL || process.env.DB_URL;
+  const useSsl =
+    process.env.DB_SSL === 'true' ||
+    (dbUrl ? dbUrl.includes('sslmode=') || dbUrl.includes('neon.tech') : false);
+
+  const sslOption = useSsl ? { rejectUnauthorized: false } : false;
+
+  if (dbUrl) {
+    return {
+      type: 'postgres',
+      url: dbUrl,
+      ssl: sslOption,
+      entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
+      synchronize: process.env.NODE_ENV !== 'production',
+      logging: process.env.NODE_ENV === 'development',
+      extra: {
+        max: 50,
+        min: 10,
+        idleTimeoutMillis: 30000,
+      },
+    } as DataSourceOptions;
+  }
+
+  return {
+    type: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    database: process.env.DB_NAME || 'auth_db',
+    ssl: sslOption,
+    entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
+    synchronize: process.env.NODE_ENV !== 'production',
+    logging: process.env.NODE_ENV === 'development',
+    extra: {
+      max: 50,
+      min: 10,
+      idleTimeoutMillis: 30000,
+    },
+  } as DataSourceOptions;
+}
+
 function createRedisClient(): Redis {
   const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_URL;
   const isTls =
@@ -28,6 +71,9 @@ function createRedisClient(): Redis {
   if (redisUrl) {
     return new Redis(redisUrl, {
       tls: tlsOption,
+      db: 0,
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
     });
   }
 
@@ -37,8 +83,17 @@ function createRedisClient(): Redis {
     password: process.env.REDIS_PASSWORD || undefined,
     username: process.env.REDIS_USERNAME || undefined,
     tls: tlsOption,
+    db: 0,
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
   });
 }
+
+const isRedisConfigured =
+  process.env.NODE_ENV !== 'test' &&
+  process.env.CACHE_PROVIDER === 'redis' &&
+  !!(process.env.REDIS_URL || process.env.UPSTASH_REDIS_URL) &&
+  !(process.env.REDIS_URL || '').includes('your-endpoint');
 
 @Module({
   imports: [
@@ -56,80 +111,24 @@ function createRedisClient(): Redis {
     }),
 
     // Database
-    process.env.NODE_ENV === 'test'
-      ? TypeOrmModule.forRoot({
-          type: 'sqljs',
-          autoSave: false,
-          location: 'auth_e2e',
-          entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
-          logging: false,
-          synchronize: true,
-        } as DataSourceOptions)
-      : TypeOrmModule.forRootAsync({
-          imports: [ConfigModule],
-          inject: [ConfigService],
-          useFactory: (configService: ConfigService) => {
-            const dbUrl =
-              configService.get<string>('DATABASE_URL') || configService.get<string>('DB_URL');
-            const useSsl =
-              configService.get<string>('DB_SSL') === 'true' ||
-              (dbUrl ? dbUrl.includes('sslmode=') || dbUrl.includes('neon.tech') : false);
-
-            const sslOption = useSsl ? { rejectUnauthorized: false } : false;
-
-            if (dbUrl) {
-              return {
-                type: 'postgres',
-                url: dbUrl,
-                ssl: sslOption,
-                entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
-                synchronize: configService.get('NODE_ENV') !== 'production',
-                logging: configService.get('NODE_ENV') === 'development',
-                extra: {
-                  max: 50,
-                  min: 10,
-                  idleTimeoutMillis: 30000,
-                },
-              };
-            }
-
-            return {
-              type: 'postgres',
-              host: configService.get('DB_HOST', 'localhost'),
-              port: configService.get('DB_PORT', 5432),
-              username: configService.get('DB_USERNAME', 'postgres'),
-              password: configService.get('DB_PASSWORD', 'postgres'),
-              database: configService.get('DB_NAME', 'auth_db'),
-              ssl: sslOption,
-              entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
-              synchronize: configService.get('NODE_ENV') !== 'production',
-              logging: configService.get('NODE_ENV') === 'development',
-              extra: {
-                max: 50,
-                min: 10,
-                idleTimeoutMillis: 30000,
-              },
-            };
-          },
-        }),
+    TypeOrmModule.forRoot({
+      ...(process.env.NODE_ENV === 'test'
+        ? ({
+            type: 'sqljs',
+            autoSave: false,
+            location: 'auth_e2e',
+            entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
+            logging: false,
+            synchronize: true,
+          } as DataSourceOptions)
+        : getTypeOrmOptions()),
+      autoLoadEntities: true,
+    }),
 
     // Auth Module
     AuthModule.forRoot({
-      cacheProvider:
-        process.env.NODE_ENV === 'test'
-          ? 'memory'
-          : process.env.CACHE_PROVIDER === 'redis' ||
-              process.env.REDIS_URL ||
-              process.env.UPSTASH_REDIS_URL
-            ? 'redis'
-            : 'memory',
-      redisClient:
-        process.env.NODE_ENV !== 'test' &&
-        (process.env.CACHE_PROVIDER === 'redis' ||
-          process.env.REDIS_URL ||
-          process.env.UPSTASH_REDIS_URL)
-          ? createRedisClient()
-          : undefined,
+      cacheProvider: isRedisConfigured ? 'redis' : 'memory',
+      redisClient: isRedisConfigured ? createRedisClient() : undefined,
     }),
 
     // Feature Modules
