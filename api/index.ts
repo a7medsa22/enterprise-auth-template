@@ -6,7 +6,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from '../apps/demo/dist/app.module';
+import { AppModule } from '../apps/demo/src/app.module';
 import helmet from 'helmet';
 import compression from 'compression';
 import express from 'express';

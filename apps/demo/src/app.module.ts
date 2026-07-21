@@ -39,22 +39,35 @@ function getTypeOrmOptions(): DataSourceOptions {
     } as DataSourceOptions;
   }
 
+  const dbHost = process.env.DB_HOST;
+  if (dbHost && dbHost !== 'localhost' && dbHost !== '127.0.0.1') {
+    return {
+      type: 'postgres',
+      host: dbHost,
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      database: process.env.DB_NAME || 'auth_db',
+      ssl: sslOption,
+      entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
+      synchronize: process.env.NODE_ENV !== 'production',
+      logging: process.env.NODE_ENV === 'development',
+      extra: {
+        max: 50,
+        min: 10,
+        idleTimeoutMillis: 30000,
+      },
+    } as DataSourceOptions;
+  }
+
+  // Fallback to in-memory sqljs for serverless / demo environments when Postgres is not configured
   return {
-    type: 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432', 10),
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'auth_db',
-    ssl: sslOption,
+    type: 'sqljs',
+    autoSave: false,
+    location: 'auth_demo',
     entities: [UserEntity, SessionEntity, RefreshTokenEntity, AuditLogEntity],
-    synchronize: process.env.NODE_ENV !== 'production',
-    logging: process.env.NODE_ENV === 'development',
-    extra: {
-      max: 50,
-      min: 10,
-      idleTimeoutMillis: 30000,
-    },
+    logging: false,
+    synchronize: true,
   } as DataSourceOptions;
 }
 
