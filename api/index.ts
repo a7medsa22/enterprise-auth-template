@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'tsconfig-paths/register';
 import '@nestjs/core';
 import '@nestjs/common';
 import '@nestjs/typeorm';
