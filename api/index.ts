@@ -7,40 +7,36 @@ tsConfigPaths.register({
   baseUrl: rootDir,
   paths: {
     '@auth-template/core': [
-      path.join(rootDir, 'packages/core/src/index.ts'),
-      path.join(rootDir, 'packages/core/src/index'),
       path.join(rootDir, 'packages/core/dist/index'),
+      path.join(rootDir, 'packages/core/src/index'),
     ],
     '@auth-template/core/*': [
-      path.join(rootDir, 'packages/core/src/*'),
       path.join(rootDir, 'packages/core/dist/*'),
+      path.join(rootDir, 'packages/core/src/*'),
     ],
     '@auth-template/typeorm': [
-      path.join(rootDir, 'packages/typeorm/src/index.ts'),
-      path.join(rootDir, 'packages/typeorm/src/index'),
       path.join(rootDir, 'packages/typeorm/dist/index'),
+      path.join(rootDir, 'packages/typeorm/src/index'),
     ],
     '@auth-template/typeorm/*': [
-      path.join(rootDir, 'packages/typeorm/src/*'),
       path.join(rootDir, 'packages/typeorm/dist/*'),
+      path.join(rootDir, 'packages/typeorm/src/*'),
     ],
     '@auth-template/nestjs-adapter': [
-      path.join(rootDir, 'packages/nestjs-adapter/src/index.ts'),
-      path.join(rootDir, 'packages/nestjs-adapter/src/index'),
       path.join(rootDir, 'packages/nestjs-adapter/dist/index'),
+      path.join(rootDir, 'packages/nestjs-adapter/src/index'),
     ],
     '@auth-template/nestjs-adapter/*': [
-      path.join(rootDir, 'packages/nestjs-adapter/src/*'),
       path.join(rootDir, 'packages/nestjs-adapter/dist/*'),
+      path.join(rootDir, 'packages/nestjs-adapter/src/*'),
     ],
     '@auth-template/express-adapter': [
-      path.join(rootDir, 'packages/express-adapter/src/index.ts'),
-      path.join(rootDir, 'packages/express-adapter/src/index'),
       path.join(rootDir, 'packages/express-adapter/dist/index'),
+      path.join(rootDir, 'packages/express-adapter/src/index'),
     ],
     '@auth-template/express-adapter/*': [
-      path.join(rootDir, 'packages/express-adapter/src/*'),
       path.join(rootDir, 'packages/express-adapter/dist/*'),
+      path.join(rootDir, 'packages/express-adapter/src/*'),
     ],
   },
 });

@@ -2,13 +2,9 @@
   "name": "@auth-template/nestjs-adapter",
   "version": "1.0.0",
   "description": "NestJS adapter for auth-template core",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts"
-  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "src",
     "dist",
     "README.md"
   ],
