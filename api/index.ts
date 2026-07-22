@@ -1,5 +1,22 @@
 import 'reflect-metadata';
-import 'tsconfig-paths/register';
+import * as path from 'path';
+import * as tsConfigPaths from 'tsconfig-paths';
+
+const rootDir = path.resolve(__dirname, '..');
+tsConfigPaths.register({
+  baseUrl: rootDir,
+  paths: {
+    '@auth-template/core': [path.join(rootDir, 'packages/core/src/index')],
+    '@auth-template/core/*': [path.join(rootDir, 'packages/core/src/*')],
+    '@auth-template/typeorm': [path.join(rootDir, 'packages/typeorm/src/index')],
+    '@auth-template/typeorm/*': [path.join(rootDir, 'packages/typeorm/src/*')],
+    '@auth-template/nestjs-adapter': [path.join(rootDir, 'packages/nestjs-adapter/src/index')],
+    '@auth-template/nestjs-adapter/*': [path.join(rootDir, 'packages/nestjs-adapter/src/*')],
+    '@auth-template/express-adapter': [path.join(rootDir, 'packages/express-adapter/src/index')],
+    '@auth-template/express-adapter/*': [path.join(rootDir, 'packages/express-adapter/src/*')],
+  },
+});
+
 import '@nestjs/core';
 import '@nestjs/common';
 import '@nestjs/typeorm';
