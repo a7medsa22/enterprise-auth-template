@@ -8,7 +8,8 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "pnpm -r run build && pnpm run build:api",
+    "build:api": "esbuild api/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=api/index.js --external:express --external:@nestjs/* --external:typeorm --external:pg --external:ioredis --external:bcryptjs --external:helmet --external:compression --external:passport --external:passport-jwt --external:reflect-metadata --external:rxjs --external:class-validator --external:class-transformer",
     "build:core": "pnpm --filter \"@auth-template/core\" run build",
     "build:nestjs": "pnpm --filter \"@auth-template/nestjs-adapter\" run build",
     "build:demo": "pnpm --filter \"demo-api\" run build",
@@ -72,6 +73,7 @@
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.0",
+    "esbuild": "^0.20.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
