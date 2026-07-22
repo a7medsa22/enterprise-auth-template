@@ -1,6 +1,6 @@
 import { IPasswordHasher } from '@auth-template/core/application';
 import { Result, PasswordValidator } from '@auth-template/core';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export class BcryptHasher implements IPasswordHasher {
   private readonly rounds: number;

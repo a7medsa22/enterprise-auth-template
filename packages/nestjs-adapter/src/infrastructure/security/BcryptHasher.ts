@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IPasswordHasher } from '@auth-template/core/application';
 import { Result, PasswordValidator } from '@auth-template/core';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

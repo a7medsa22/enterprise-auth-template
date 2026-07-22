@@ -48,6 +48,10 @@ async function bootstrapServer() {
       exclude: ['health'],
     });
 
+    server.get('/', (req: any, res: any) => {
+      res.redirect('/api');
+    });
+
     const config = new DocumentBuilder()
       .setTitle('Enterprise Auth API')
       .setDescription('The API documentation for the Enterprise Auth Template')
@@ -66,7 +70,15 @@ async function bootstrapServer() {
       )
       .build();
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);
+    SwaggerModule.setup('api', app, document, {
+      customCssUrl:
+        'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+      customJs: [
+        'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js',
+      ],
+      customSiteTitle: 'Enterprise Auth API Docs',
+    });
 
     await app.init();
     isInitialized = true;
@@ -75,6 +87,15 @@ async function bootstrapServer() {
 }
 
 export default async function handler(req: any, res: any) {
-  await bootstrapServer();
-  server(req, res);
+  try {
+    await bootstrapServer();
+    server(req, res);
+  } catch (err: any) {
+    console.error('Vercel Serverless Function Error:', err);
+    res.status(500).json({
+      statusCode: 500,
+      error: 'Internal Server Error',
+      message: err?.message || 'Serverless function initialization failed',
+    });
+  }
 }
